@@ -15,13 +15,27 @@ class CorneaReader():
     def __init__(self) -> None:
         """Start the facemesh solution and be ready to read eye values
 
-        Returns:
-        ---------
-        values that i think would be beneficial to the model: distance from the iris to all eye landmarks, distance from closest point to each eye (distance between eyes)
         """
         self.faceMesh = mp_face_mesh.FaceMesh(max_num_faces=1, refine_landmarks=True, min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
     def readEyes(self, frame: np.array) -> list[np.array]:
+        """Method to derive all eye points needed from a frame
+
+        Input:
+        -------
+        frame: required, numpy array representing the camera frame
+
+        Returns:
+        ---------
+        frame: the same input frame after processing and applying shapes to visualize points
+        leftIrisDistances: a numpy array containing the Euclidean distances from the left eye iris to all left eye points
+        rightIrisDistances: a numpy array containing the Euclidean distances from the right eye iris to all right eye points
+        middleEyeDistance: the distance between the closest points of each eye
+
+        Output Format:
+        --------------
+        frame, (left, right, middle)
+        """
 
         frame = cv2.flip(frame, 1)
         frameRGB = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -55,7 +69,7 @@ class CorneaReader():
             cv2.circle(frame, leftCenter, 1, (0,255,0), 1)
             cv2.circle(frame, rightCenter, 1, (0,255,0), 1)
 
-        return frame
+        return frame, (leftIrisDistances, rightIrisDistances, middleEyeDistance)
 
 
 
