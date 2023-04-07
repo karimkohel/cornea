@@ -32,13 +32,16 @@ class CorneaReader():
             leftCenter = np.array([leftCX, leftCY], dtype=np.int32)
             rightCenter = np.array([rightCX, rightCY], dtype=np.int32)
 
-            irisLandmarks = np.concatenate((meshPoints[self.LEFT_IRIS], meshPoints[self.RIGHT_IRIS]))
             eyeLandmarks = np.concatenate((meshPoints[self.LEFT_EYE], meshPoints[self.RIGHT_EYE]))
 
-            for eyePoint in irisLandmarks:
-                cv2.circle(frame, eyePoint, 1, (0,0,255), 1)
+            distances = np.linalg.norm(meshPoints[self.LEFT_EYE] - leftCenter, axis=1)
+
             for eyePoint in eyeLandmarks:
                 cv2.circle(frame, eyePoint, 1, (255,0,0), 1)
+
+            for eyePoint in meshPoints[self.LEFT_EYE]:
+                cv2.line(frame, eyePoint, leftCenter, (0, 255,255), 1)
+
 
             cv2.circle(frame, leftCenter, 1, (0,255,0), 1)
             cv2.circle(frame, rightCenter, 1, (0,255,0), 1)
