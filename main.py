@@ -1,7 +1,6 @@
 import cv2
 import mediapipe as mp
 import numpy as np
-from operator import rshift
 mp_face_mesh = mp.solutions.face_mesh
 
 
