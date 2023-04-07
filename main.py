@@ -9,9 +9,9 @@ while True:
     ret, frame = cap.read()
 
     if ret:
-        frame = cornea.readEyes(frame)
+        frame, leftEyeDist, rightEyeDist, middleEyeDist = cornea.readEyes(frame)
 
-        key = cv2.waitKey(1)
+        key = cv2.waitKey(5)
         if key == ord('q'):
             break
         cv2.imshow("Frame", frame)

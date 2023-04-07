@@ -17,6 +17,7 @@ class CorneaReader():
 
         """
         self.faceMesh = mp_face_mesh.FaceMesh(max_num_faces=1, refine_landmarks=True, min_detection_confidence=0.5, min_tracking_confidence=0.5)
+        self.data = None
 
     def readEyes(self, frame: np.array) -> list[np.array]:
         """Method to derive all eye points needed from a frame
@@ -63,14 +64,22 @@ class CorneaReader():
                 cv2.line(frame, eyePoint, leftCenter, (0, 255,255), 1)
 
             cv2.line(frame, meshPoints[self.RIGHT_EYE[0]], meshPoints[self.LEFT_EYE[0]], (100, 100, 255), 1)
-            print(middleEyeDistance)
-
-
             cv2.circle(frame, leftCenter, 1, (0,255,0), 1)
             cv2.circle(frame, rightCenter, 1, (0,255,0), 1)
 
-        return frame, (leftIrisDistances, rightIrisDistances, middleEyeDistance)
+            allDists = np.concatenate((leftIrisDistances, rightIrisDistances))
+            allDists = np.append(allDists, middleEyeDistance)
+            if not type(self.data) is np.ndarray:
+                self.data = allDists
+            else:
+                self.data = np.vstack([self.data, allDists])
+            print(self.data)
 
+            return frame, leftIrisDistances, rightIrisDistances, middleEyeDistance
+        return frame, None, None, None
+
+        def __cropEye(self, frame: np.array) -> np.array:
+            pass
 
 
     def __del__(self) -> None:
