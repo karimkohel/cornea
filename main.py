@@ -23,13 +23,24 @@ with mp_face_mesh.FaceMesh(max_num_faces=1, refine_landmarks=True, min_detection
 
         if results.multi_face_landmarks:
             meshPoints = np.array([np.multiply([p.x, p.y], [imgWidth, imgHeigh]).astype(int) for p in results.multi_face_landmarks[0].landmark])
+
             (leftCX, leftCY), leftRadius = cv2.minEnclosingCircle(meshPoints[LEFT_IRIS])
             (rightCX, rightCY), rightRadius = cv2.minEnclosingCircle(meshPoints[RIGHT_IRIS])
             leftCenter = np.array([leftCX, leftCY], dtype=np.int32)
             rightCenter = np.array([rightCX, rightCY], dtype=np.int32)
 
-            cv2.circle(frame, leftCenter, int(leftRadius), (0,0,255), 1, cv2.LINE_AA)
-            cv2.circle(frame, rightCenter, int(rightRadius), (0,0,255), 1, cv2.LINE_AA)
+            irisLandmarks = np.concatenate((meshPoints[LEFT_IRIS], meshPoints[RIGHT_IRIS]))
+            eyeLandmarks = np.concatenate((meshPoints[LEFT_EYE], meshPoints[RIGHT_EYE]))
+
+            for eyePoint in irisLandmarks:
+                cv2.circle(frame, eyePoint, 1, (0,0,255), 1)
+            for eyePoint in eyeLandmarks:
+                cv2.circle(frame, eyePoint, 1, (255,0,0), 1)
+
+            cv2.circle(frame, leftCenter, 1, (0,255,0), 1)
+            cv2.circle(frame, rightCenter, 1, (0,255,0), 1)
+            # cv2.circle(frame, leftCenter , int(leftRadius), (0,0,255), 1, cv2.LINE_AA)
+            # cv2.circle(frame, rightCenter, int(rightRadius), (0,0,255), 1, cv2.LINE_AA)
 
         key = cv2.waitKey(1)
         if key == ord('q'):
