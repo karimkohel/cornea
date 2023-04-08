@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split
 import numpy as np
 
 
-data = np.load('data/trial1.npy')
+data = np.load('data/trial2.npy')
 
 x = data[:, :33]
 y = data[:, 33:]
@@ -17,5 +17,5 @@ model = tf.keras.models.Sequential([
 ])
 
 model.compile(loss='mse', optimizer='adam', metrics='accuracy')
-history = model.fit(xTrain, yTrain, epochs=100, validation_split=0.2, verbose=1)
+history = model.fit(xTrain, yTrain, epochs=150, validation_split=0.2, verbose=1)
 model.save("trial1Model.h5")
