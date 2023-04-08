@@ -1,28 +1,39 @@
 import numpy as np
 import tensorflow as tf
 import pyautogui
-import time
+import cv2
+from corneaReader import CorneaReader
 
-data = np.load('data/test2.npy')
-
-x = data[60:, :33]
-y = data[60:, 33:]
-
+cap = cv2.VideoCapture(0)
+cornea = CorneaReader()
 model = tf.keras.models.load_model('trial1Model.h5')
 
+while True:
 
-# for i in range(start=0, stop=len(x), step=10):
-#     try:
+    ret, frame = cap.read()
 
+    x = None
+    i=0
+    if ret:
+        while i<5:
+            sample, frame = cornea.readEyes(frame)
+            if type(sample) == np.ndarray:
+                i = i + 1
+                if type(x) != np.ndarray:
+                    x = sample[:33]
+                else:
+                    x = np.vstack([x, sample[:33]])
 
-
-
-predictions = model.predict(x)
-
-for i in range(0, len(predictions), 10):
-    try:
-        values = predictions[i:i+10]
-        coordinates = np.average(values, axis=0)
+        predictions = model.predict(x)
+        coordinates = np.average(predictions, axis=0)
+        print(coordinates)
         pyautogui.moveTo(coordinates[0], coordinates[1])
-    except Exception:
-        break
+
+        key = cv2.waitKey(1)
+        if key == ord('q'):
+            break
+        cv2.imshow("Frame", frame)
+    
+
+cap.release()
+cv2.destroyAllWindows()
