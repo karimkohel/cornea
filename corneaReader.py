@@ -59,8 +59,7 @@ class CorneaReader():
 
             frame = self.__visualize(frame, meshPoints, leftCenter, rightCenter)
 
-            allDists = np.concatenate((leftIrisDistances, rightIrisDistances, [middleEyeDistance, ]))
-            allDists = np.append(allDists, middleEyeDistance)
+            allDists = np.concatenate((leftIrisDistances, rightIrisDistances, [middleEyeDistance, mousePos[0], mousePos[1]]))
 
             if not type(self.data) is np.ndarray:
                 self.data = allDists
