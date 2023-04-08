@@ -19,4 +19,4 @@ while True:
 
 cap.release()
 cv2.destroyAllWindows()
-# np.save("data/trial1", cornea.data)
+np.save("data/test1", cornea.data)
