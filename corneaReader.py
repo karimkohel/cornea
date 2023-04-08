@@ -65,7 +65,6 @@ class CorneaReader():
                 self.data = allDists
             else:
                 self.data = np.vstack([self.data, allDists])
-            print(self.data)
 
         return frame
 
