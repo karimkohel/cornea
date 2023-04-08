@@ -10,7 +10,7 @@ while True:
     ret, frame = cap.read()
 
     if ret:
-        frame = cornea.readEyes(frame)
+        _, frame = cornea.readEyes(frame)
 
         key = cv2.waitKey(5)
         if key == ord('q'):
@@ -19,4 +19,4 @@ while True:
 
 cap.release()
 cv2.destroyAllWindows()
-np.save("data/test2", cornea.data)
+# np.save("data/test2", cornea.data)

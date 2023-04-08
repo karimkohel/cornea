@@ -66,7 +66,9 @@ class CorneaReader():
             else:
                 self.data = np.vstack([self.data, allDists])
 
-        return frame
+            return allDists, frame
+
+        return None, frame
 
     def __visualize(self, frame: np.ndarray, meshPoints: np.ndarray, leftCenter: np.ndarray, rightCenter: np.ndarray) -> np.ndarray:
         """private method to visualize gathered eye data on the current frame"""
