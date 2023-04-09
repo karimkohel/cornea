@@ -6,7 +6,7 @@ from corneaReader import CorneaReader
 
 cap = cv2.VideoCapture(0)
 cornea = CorneaReader()
-model = tf.keras.models.load_model('models/bigModel.h5')
+model = tf.keras.models.load_model('models/laptopModel.h5')
 
 while True:
 
