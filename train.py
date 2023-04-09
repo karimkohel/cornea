@@ -3,11 +3,11 @@ from sklearn.model_selection import train_test_split
 import numpy as np
 
 
-data = np.load('data/trial3.npy')
+data = np.load('data/bigTrialData.npy')
 
-x = data[:, :33]
-y = data[:, 33:]
-xTrain, xTest, yTrain, yTest = train_test_split(x, y, test_size=0.3, random_state=30)
+x = data[50:, :33]
+y = data[50:, 33:]
+xTrain, xTest, yTrain, yTest = train_test_split(x, y, test_size=0.2, random_state=30)
 
 model = tf.keras.models.Sequential([
     tf.keras.layers.Dense(40, activation='relu', input_dim=33),
@@ -17,6 +17,6 @@ model = tf.keras.models.Sequential([
 
 model.summary()
 
-model.compile(loss='mae', optimizer='adam', metrics='accuracy')
-history = model.fit(xTrain, yTrain, epochs=25, validation_split=0.2, verbose=1)
-model.save("trial1Model.h5")
+model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(), optimizer='adam', metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
+history = model.fit(xTrain, yTrain, epochs=15, verbose=1, batch_size=24, validation_data=(xTest, yTest))
+model.save("data/bigModel.h5")
