@@ -17,6 +17,6 @@ model = tf.keras.models.Sequential([
 
 model.summary()
 
-model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(), optimizer='adam', metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
-history = model.fit(xTrain, yTrain, epochs=15, verbose=1, batch_size=24, validation_data=(xTest, yTest))
-model.save("data/bigModel.h5")
+model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
+history = model.fit(xTrain, yTrain, epochs=20, verbose=1, batch_size=24, validation_data=(xTest, yTest))
+model.save("models/bigModel.h5")
