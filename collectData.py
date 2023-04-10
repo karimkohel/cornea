@@ -1,5 +1,5 @@
 import cv2
-from corneaReader import CorneaReader
+from classes.corneaReader import CorneaReader
 import numpy as np
 
 cap = cv2.VideoCapture(0)
@@ -19,4 +19,4 @@ while True:
 
 cap.release()
 cv2.destroyAllWindows()
-np.save("data/osamaTestfelBeit", cornea.data)
+# np.save("data/osamaTestfelBeit", cornea.data)
