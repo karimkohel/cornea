@@ -8,7 +8,7 @@ denseInput = tf.keras.layers.Input(shape=(33))
 
 x = tf.keras.layers.Conv2D(32, (3,3), activation='relu', input_shape=convInput.shape)(convInput)
 x = tf.keras.layers.MaxPool2D()(x)
-x = tf.keras.layers.Conv2D(32, (3,3), activation='relu', input_shape=x.shape)(x)
+x = tf.keras.layers.Conv2D(12, (3,3), activation='relu', input_shape=x.shape)(x)
 x = tf.keras.layers.MaxPool2D()(x)
 x = tf.keras.layers.Flatten()(x)
 x = tf.keras.layers.concatenate([x, denseInput])
