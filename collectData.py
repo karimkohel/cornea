@@ -1,10 +1,11 @@
 import cv2
-from classes.corneaReader import CorneaReader
+from classes.cornea import CorneaReader
 import numpy as np
 
 cap = cv2.VideoCapture(0)
 cornea = CorneaReader()
 
+print("started")
 while True:
 
     ret, frame = cap.read()

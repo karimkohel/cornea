@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 import pyautogui
 import cv2
-from classes.corneaReader import CorneaReader
+from classes.cornea import CorneaReader
 
 cap = cv2.VideoCapture(0)
 cornea = CorneaReader()
