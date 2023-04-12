@@ -15,13 +15,9 @@ class CorneaReader():
     RIGHT_IRIS_CENTER = 468
 
     EYESTRIP = [27, 28, 56, 190, 243, 112, 26, 22, 23, 24, 110, 25, 130, 247, 30, 29, 257, 259, 260, 467, 359, 255, 339, 254, 253, 252, 256, 341, 463, 414, 286, 258]
-    #     'leftLid': (257, 259, 260, 467, 359, 255, 339, 254, 253, 252, 256, 341, 463, 414, 286, 258),
-    #     'rightLid': (27, 28, 56, 190, 243, 112, 26, 22, 23, 24, 110, 25, 130, 247, 30, 29),
-    #     'eyeLids': (27, 28, 56, 190, 243, 112, 26, 22, 23, 24, 110, 25, 130, 247, 30, 29, 257, 259, 260, 467, 359, 255, 339, 254, 253, 252, 256, 341, 463, 414, 286, 258)
-    # }
 
     def __init__(self) -> None:
-        """Start the facemesh solution and be ready to read eye values
+        """Start the facemesh solution and be ready to read eye values & fetch eye images
 
         """
         mp_face_mesh = mp.solutions.face_mesh
@@ -64,13 +60,12 @@ class CorneaReader():
             leftIrisDistances = np.linalg.norm(meshPoints[self.LEFT_EYE] - meshPoints[self.LEFT_IRIS_CENTER], axis=1)
             rightIrisDistances = np.linalg.norm(meshPoints[self.RIGHT_EYE] - meshPoints[self.RIGHT_IRIS_CENTER], axis=1)
             middleEyeDistance = np.linalg.norm(meshPoints[self.RIGHT_EYE[0]] - meshPoints[self.LEFT_EYE[0]])
-            allMetrics = np.concatenate((leftIrisDistances, rightIrisDistances, [middleEyeDistance, mousePos[0], mousePos[1]]))
-            allData = np.concatenate((allMetrics, croppedFrame))
+            eyesMetrics = np.concatenate((leftIrisDistances, rightIrisDistances, [middleEyeDistance]))
 
             if saveDir:
-                self.__saveDataArray(allData, saveDir)
+                self.__saveDataArray(eyesMetrics, croppedFrame, mousePos, saveDir)
 
-            return allData, frame
+            return (eyesMetrics, croppedFrame), frame
 
         return None, frame
 
@@ -83,6 +78,7 @@ class CorneaReader():
         return frame
 
     def __cropEye(self, frame: np.ndarray, meshPoints: np.ndarray) -> np.ndarray:
+        """private method to take in the entire frame and crop the eyestrip with max enclosure"""
         eyeStripCoordinates = meshPoints[self.EYESTRIP]
         maxX, maxY = np.amax(eyeStripCoordinates, axis=0)
         minX, minY = np.amin(eyeStripCoordinates, axis=0)
@@ -90,14 +86,26 @@ class CorneaReader():
         return frame
 
 
-    def __saveDataArray(self, dataArray: np.ndarray, saveDir: str) -> None:
+    def __saveDataArray(self, eyesMetrics: np.ndarray, croppedFrame: np.ndarray, mousePos: list[int], saveDir: str) -> None:
+        """private method that would save data arrays to memory based on input to read eyes method and current data index"""
         i = 0
         try:
             prevDataFiles = os.listdir(f"data/{saveDir}")
             i = len(prevDataFiles)
         except FileNotFoundError:
             os.mkdir(f"data/{saveDir}")
-        np.save(f"data/{saveDir}/{i}", dataArray)
+        np.savez(f"data/{saveDir}/{i}", eyesMetrics=eyesMetrics, croppedFrame=croppedFrame, mousePos=mousePos)
+
+    @staticmethod
+    def preProcess(dataDir: str) -> np.ndarray:
+        """static method to load the image and metrics data from a given directory"""
+        dataFiles = os.listdir(f"data/{dataDir}")
+        allData = np.e
+        for file in dataFiles:
+            eyesMetrics = file['eyesMetrics']
+            croppedFrame = file['croppedFrame']
+            mousePos = file['mousePos']
+
 
 
     def __del__(self) -> None:
