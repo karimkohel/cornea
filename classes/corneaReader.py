@@ -1,6 +1,7 @@
 import cv2
 import mediapipe as mp
 import numpy as np
+import os
 import pyautogui
 
 
@@ -10,14 +11,14 @@ class CorneaReader():
 
     LEFT_EYE = [362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385, 384, 398]
     RIGHT_EYE = [133, 33, 7, 163, 144, 145, 153, 154, 155, 173, 157, 158, 159, 160, 161, 246]
-    LEFT_IRIS = [474, 475, 476, 477]
-    RIGHT_IRIS = [469, 470, 471, 472]
+    LEFT_IRIS_CENTER = 473
+    RIGHT_IRIS_CENTER = 468
 
-    EYESTRIP = {
-        'xlim': (130, 359),
-        'ylimLeft': (257, 253),
-        'ylimRight': (27, 23)
-    }
+    EYESTRIP = [27, 28, 56, 190, 243, 112, 26, 22, 23, 24, 110, 25, 130, 247, 30, 29, 257, 259, 260, 467, 359, 255, 339, 254, 253, 252, 256, 341, 463, 414, 286, 258]
+    #     'leftLid': (257, 259, 260, 467, 359, 255, 339, 254, 253, 252, 256, 341, 463, 414, 286, 258),
+    #     'rightLid': (27, 28, 56, 190, 243, 112, 26, 22, 23, 24, 110, 25, 130, 247, 30, 29),
+    #     'eyeLids': (27, 28, 56, 190, 243, 112, 26, 22, 23, 24, 110, 25, 130, 247, 30, 29, 257, 259, 260, 467, 359, 255, 339, 254, 253, 252, 256, 341, 463, 414, 286, 258)
+    # }
 
     def __init__(self) -> None:
         """Start the facemesh solution and be ready to read eye values
@@ -27,8 +28,10 @@ class CorneaReader():
         self.faceMesh = mp_face_mesh.FaceMesh(max_num_faces=1, refine_landmarks=True, min_detection_confidence=0.5, min_tracking_confidence=0.5)
         self.data = None
 
-    def readEyes(self, frame: np.ndarray) -> np.ndarray:
+    def readEyes(self, frame: np.ndarray, saveDir: str = None) -> np.ndarray:
         """Method to derive all eye points needed from a frame
+
+        the method saves the eye distances as the first 33 elements of the data array, the xy labels for mouse as the 34th and 35th elements, while the rest is the image data
 
         Input:
         -------
@@ -48,64 +51,53 @@ class CorneaReader():
         mousePos = pyautogui.position()
         frame = cv2.flip(frame, 1)
         frameRGB = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         imgHeigh, imgWidth = frame.shape[:2]
         results = self.faceMesh.process(frameRGB)
 
         if results.multi_face_landmarks:
             meshPoints = np.array([np.multiply([p.x, p.y], [imgWidth, imgHeigh]).astype(int) for p in results.multi_face_landmarks[0].landmark])
 
-            (leftCX, leftCY), _ = cv2.minEnclosingCircle(meshPoints[self.LEFT_IRIS])
-            (rightCX, rightCY), _ = cv2.minEnclosingCircle(meshPoints[self.RIGHT_IRIS])
-            leftCenter = np.array([leftCX, leftCY], dtype=np.int32)
-            rightCenter = np.array([rightCX, rightCY], dtype=np.int32)
+            frame = self.__visualize(frame, meshPoints, meshPoints[self.LEFT_IRIS_CENTER], meshPoints[self.RIGHT_IRIS_CENTER])
+            croppedFrame = self.__cropEye(frame, meshPoints)
 
-            leftIrisDistances = np.linalg.norm(meshPoints[self.LEFT_EYE] - leftCenter, axis=1)
-            rightIrisDistances = np.linalg.norm(meshPoints[self.RIGHT_EYE] - rightCenter, axis=1)
+            leftIrisDistances = np.linalg.norm(meshPoints[self.LEFT_EYE] - meshPoints[self.LEFT_IRIS_CENTER], axis=1)
+            rightIrisDistances = np.linalg.norm(meshPoints[self.RIGHT_EYE] - meshPoints[self.RIGHT_IRIS_CENTER], axis=1)
             middleEyeDistance = np.linalg.norm(meshPoints[self.RIGHT_EYE[0]] - meshPoints[self.LEFT_EYE[0]])
+            allMetrics = np.concatenate((leftIrisDistances, rightIrisDistances, [middleEyeDistance, mousePos[0], mousePos[1]]))
+            allData = np.concatenate((allMetrics, croppedFrame))
 
-            frame = self.__visualize(frame, meshPoints, leftCenter, rightCenter)
-            frame = self.__cropEye(frame)
+            if saveDir:
+                self.__saveDataArray(allData, saveDir)
 
-
-            allDists = np.concatenate((leftIrisDistances, rightIrisDistances, [middleEyeDistance, mousePos[0], mousePos[1]]))
-
-            if not type(self.data) is np.ndarray:
-                self.data = allDists
-            else:
-                self.data = np.vstack([self.data, allDists])
-
-            return allDists, frame
+            return allData, frame
 
         return None, frame
 
     def __visualize(self, frame: np.ndarray, meshPoints: np.ndarray, leftCenter: np.ndarray, rightCenter: np.ndarray) -> np.ndarray:
         """private method to visualize gathered eye data on the current frame"""
 
-        eyeLandmarks = np.concatenate((meshPoints[self.LEFT_EYE], meshPoints[self.RIGHT_EYE]))
-
-        for eyePoint in eyeLandmarks:
-            cv2.circle(frame, eyePoint, 1, (255,0,0), 1)
-
-        for eyePoint in meshPoints[self.LEFT_EYE]:
-            cv2.line(frame, eyePoint, leftCenter, (0, 255,255), 1)
-
-        cv2.line(frame, meshPoints[self.RIGHT_EYE[0]], meshPoints[self.LEFT_EYE[0]], (100, 100, 255), 1)
-        cv2.circle(frame, leftCenter, 1, (0,255,0), 1)
-        cv2.circle(frame, rightCenter, 1, (0,255,0), 1)
-
-        cv2.circle(frame, meshPoints[self.EYESTRIP['xlim'][0]], 1, (0,255,255), 2)
-        cv2.circle(frame, meshPoints[self.EYESTRIP['xlim'][1]], 1, (0,255,255), 2)
-
-        if meshPoints[self.EYESTRIP['xlim'][0]][1] > meshPoints[self.EYESTRIP['xlim'][1]][1]:
-            print("LEFT IS HIGHER: ", meshPoints[self.EYESTRIP['xlim'][0]])
-        else:
-            print("RIGHT IS HIGHER: ", meshPoints[self.EYESTRIP['xlim'][1]])
+        cv2.circle(frame, leftCenter, 1, (0,255,0), 3)
+        cv2.circle(frame, rightCenter, 1, (0,255,0), 3)
 
         return frame
 
-    def __cropEye(self, frame: np.ndarray) -> np.ndarray:
-        frame = frame[:,meshPoints[self.EYESTRIP['xlim'][0]][0]:meshPoints[self.EYESTRIP['xlim'][1]][0]]
-        frame = frame[:,meshPoints[self.EYESTRIP['xlim'][0]][0]:meshPoints[self.EYESTRIP['xlim'][1]][0]]
+    def __cropEye(self, frame: np.ndarray, meshPoints: np.ndarray) -> np.ndarray:
+        eyeStripCoordinates = meshPoints[self.EYESTRIP]
+        maxX, maxY = np.amax(eyeStripCoordinates, axis=0)
+        minX, minY = np.amin(eyeStripCoordinates, axis=0)
+        frame = frame[minY:maxY, minX:maxX]
+        return frame
+
+
+    def __saveDataArray(self, dataArray: np.ndarray, saveDir: str) -> None:
+        i = 0
+        try:
+            prevDataFiles = os.listdir(f"data/{saveDir}")
+            i = len(prevDataFiles)
+        except FileNotFoundError:
+            os.mkdir(f"data/{saveDir}")
+        np.save(f"data/{saveDir}/{i}", dataArray)
 
 
     def __del__(self) -> None:
