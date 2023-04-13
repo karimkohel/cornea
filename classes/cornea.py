@@ -15,6 +15,7 @@ class CorneaReader():
     RIGHT_IRIS_CENTER = 468
 
     EYESTRIP = [27, 28, 56, 190, 243, 112, 26, 22, 23, 24, 110, 25, 130, 247, 30, 29, 257, 259, 260, 467, 359, 255, 339, 254, 253, 252, 256, 341, 463, 414, 286, 258]
+    TARGET = [40, 130]
 
     def __init__(self) -> None:
         """Start the facemesh solution and be ready to read eye values & fetch eye images
@@ -65,8 +66,11 @@ class CorneaReader():
             if saveDir:
                 self.__saveDataArray(eyesMetrics, croppedFrame, mousePos, saveDir)
 
+            croppedFrame = self.resizeAspectRatio(croppedFrame)
+            
             return (eyesMetrics, croppedFrame), frame
-
+        
+        croppedFrame = frame
         return None, frame
 
     def __visualize(self, frame: np.ndarray, meshPoints: np.ndarray, leftCenter: np.ndarray, rightCenter: np.ndarray) -> np.ndarray:
@@ -118,3 +122,48 @@ class CorneaReader():
 
     def __del__(self) -> None:
         self.faceMesh.close()
+
+
+    def resizeAspectRatio(self, image):
+        widthPerc = 0
+        heightPerc = 0
+        
+
+        heightPerc = self.TARGET[0] - image.shape[0]
+        widthPerc = self.TARGET[1] - image.shape[1]
+
+        heightPerc = heightPerc * 100 / self.TARGET[0]
+        widthPerc = widthPerc * 100 / self.TARGET[1]
+
+        if heightPerc < widthPerc:
+            scale_percent = heightPerc
+
+        else:
+            scale_percent = widthPerc        
+
+        width = image.shape[1] + int(self.TARGET[1] * scale_percent / 100)
+        height = image.shape[0] + int(self.TARGET[0] * scale_percent / 100)
+        dim = (width, height)
+        image = cv2.resize(image, dim, interpolation = cv2.INTER_AREA)
+
+        image = self.paddingRestOfImage(image)   
+        
+        return image
+    
+    def paddingRestOfImage(self, image):
+            
+        # Get the current size of the image
+        current_size = image.shape[:2]
+
+        # Compute the amount of padding needed
+        padding_width = self.TARGET[1] - current_size[1]
+        padding_height = self.TARGET[0] - current_size[0]
+        
+        image = cv2.copyMakeBorder(image,
+                                top=0,
+                                bottom=padding_height,
+                                left=0,
+                                right=padding_width,
+                                borderType=cv2.BORDER_CONSTANT,
+                                value=(0, 0, 0))
+        return image
