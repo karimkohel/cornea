@@ -99,14 +99,22 @@ class CorneaReader():
     @staticmethod
     def preProcess(dataDir: str) -> np.ndarray:
         """static method to load the image and metrics data from a given directory"""
-        dataFiles = os.listdir(f"data/{dataDir}")
-        allData = np.e
-        for file in dataFiles:
-            eyesMetrics = file['eyesMetrics']
-            croppedFrame = file['croppedFrame']
-            mousePos = file['mousePos']
+        filesPath = f"data/{dataDir}/"
+        samplesFilesNames = os.listdir(filesPath)
+        numOfSamples = len(samplesFilesNames)
+        eyesMetrics = np.zeros((numOfSamples, 33))
+        frames = np.zeros((numOfSamples, 40, 120))
+        mousePos = np.zeros((numOfSamples, 2))
 
+        for i, file in enumerate(samplesFilesNames):
+            file = np.load(filesPath+file)
+            eyesMetrics[i] = file['eyesMetrics']
+            frames[i] = cv2.resize(file['croppedFrame'], (120, 40))
+            mousePos[i] = file['mousePos']
 
+        print(frames.shape)
+
+        return (eyesMetrics, frames, mousePos)
 
     def __del__(self) -> None:
         self.faceMesh.close()
