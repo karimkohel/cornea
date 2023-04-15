@@ -15,7 +15,7 @@ class CorneaReader():
     RIGHT_IRIS_CENTER = 468
 
     EYESTRIP = [27, 28, 56, 190, 243, 112, 26, 22, 23, 24, 110, 25, 130, 247, 30, 29, 257, 259, 260, 467, 359, 255, 339, 254, 253, 252, 256, 341, 463, 414, 286, 258]
-    TARGET = [40, 130]
+    TARGET = [40, 120]
 
     def __init__(self) -> None:
         """Start the facemesh solution and be ready to read eye values & fetch eye images
@@ -100,8 +100,7 @@ class CorneaReader():
             os.mkdir(f"data/{saveDir}")
         np.savez(f"data/{saveDir}/{i}", eyesMetrics=eyesMetrics, croppedFrame=croppedFrame, mousePos=mousePos)
 
-    @staticmethod
-    def preProcess(dataDir: str) -> np.ndarray:
+    def preProcess(self, dataDir: str) -> np.ndarray:
         """static method to load the image and metrics data from a given directory"""
         filesPath = f"data/{dataDir}/"
         samplesFilesNames = os.listdir(filesPath)
@@ -117,7 +116,7 @@ class CorneaReader():
             frames[i] = resizedFrame
             mousePos[i] = file['mousePos']
             
-            # CorneaReader.__showFrameThenExit(frames[i], 3)
+            self.__showFrameThenExit(frames[i], 3)
 
 
         return (eyesMetrics, frames, mousePos)
@@ -154,7 +153,6 @@ class CorneaReader():
         return image
     
     def paddingRestOfImage(self, image):
-            
         # Get the current size of the image
         current_size = image.shape[:2]
 
@@ -171,7 +169,6 @@ class CorneaReader():
                                 value=(0, 0, 0))
         return image
 
-    @staticmethod
     def __showFrameThenExit(frame: np.ndarray, sec: int) -> None:
         """A debugging method used to show a frame for a number of seconds and exit do not use unless debugging only"""
         cv2.imshow("frame", frame)
