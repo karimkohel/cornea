@@ -106,18 +106,21 @@ class CorneaReader():
         samplesFilesNames = os.listdir(filesPath)
         numOfSamples = len(samplesFilesNames)
         eyesMetrics = np.empty((numOfSamples, 33))
-        frames = np.empty((numOfSamples, 40, 120))
+        frames = []
         mousePos = np.empty((numOfSamples, 2))
 
         for i, file in enumerate(samplesFilesNames):
             file = np.load(filesPath+file)
             eyesMetrics[i] = file['eyesMetrics']
-            resizedFrame = cv2.resize(file['croppedFrame'], (120, 40))
-            frames[i] = resizedFrame
+            resizedFrame = self.resizeAspectRatio(file['croppedFrame'])
+            frames.append(resizedFrame)
             mousePos[i] = file['mousePos']
-            
-            self.__showFrameThenExit(frames[i], 3)
-
+            # self.__showFrameThenExit(resizedFrame, 6)
+            # self.__showFrameThenExit(frames[i], 6)
+        print(len(frames),"1")
+        frames= np.array(frames)
+        print(len(frames),"2")
+        self.__showFrameThenExit(frames[1],10)
 
         return (eyesMetrics, frames, mousePos)
 
