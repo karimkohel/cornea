@@ -3,6 +3,7 @@ from sklearn.model_selection import train_test_split
 import numpy as np
 from classes.cornea import CorneaReader
 cr = CorneaReader()
+
 eyesMetrics, frames, y = cr.preProcess('initTest')
 
 convInput = tf.keras.layers.Input(shape=(40,120, 1), name="frames")
@@ -29,7 +30,7 @@ model.summary()
 model.fit(
     {"eyesMetrics": eyesMetrics, "frames": frames},
     {"mousePos": y},
-    epochs=5,
+    epochs=100,
     verbose=1,
     batch_size=24
 )
