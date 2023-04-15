@@ -1,7 +1,7 @@
 import cv2
 import mediapipe as mp
 import numpy as np
-import os
+import os, time
 import pyautogui
 
 
@@ -55,22 +55,22 @@ class CorneaReader():
         if results.multi_face_landmarks:
             meshPoints = np.array([np.multiply([p.x, p.y], [imgWidth, imgHeigh]).astype(int) for p in results.multi_face_landmarks[0].landmark])
 
-            frame = self.__visualize(frame, meshPoints, meshPoints[self.LEFT_IRIS_CENTER], meshPoints[self.RIGHT_IRIS_CENTER])
+            # frame = self.__visualize(frame, meshPoints, meshPoints[self.LEFT_IRIS_CENTER], meshPoints[self.RIGHT_IRIS_CENTER]) # NOT FOR PRODUCTION
             croppedFrame = self.__cropEye(frame, meshPoints)
 
             leftIrisDistances = np.linalg.norm(meshPoints[self.LEFT_EYE] - meshPoints[self.LEFT_IRIS_CENTER], axis=1)
             rightIrisDistances = np.linalg.norm(meshPoints[self.RIGHT_EYE] - meshPoints[self.RIGHT_IRIS_CENTER], axis=1)
             middleEyeDistance = np.linalg.norm(meshPoints[self.RIGHT_EYE[0]] - meshPoints[self.LEFT_EYE[0]])
             eyesMetrics = np.concatenate((leftIrisDistances, rightIrisDistances, [middleEyeDistance]))
+            frame = croppedFrame
 
             if saveDir:
                 self.__saveDataArray(eyesMetrics, croppedFrame, mousePos, saveDir)
 
-            croppedFrame = self.resizeAspectRatio(croppedFrame)
+            # croppedFrame = self.resizeAspectRatio(croppedFrame)
             
             return (eyesMetrics, croppedFrame), frame
         
-        croppedFrame = frame
         return None, frame
 
     def __visualize(self, frame: np.ndarray, meshPoints: np.ndarray, leftCenter: np.ndarray, rightCenter: np.ndarray) -> np.ndarray:
@@ -106,21 +106,24 @@ class CorneaReader():
         filesPath = f"data/{dataDir}/"
         samplesFilesNames = os.listdir(filesPath)
         numOfSamples = len(samplesFilesNames)
-        eyesMetrics = np.zeros((numOfSamples, 33))
-        frames = np.zeros((numOfSamples, 40, 120))
-        mousePos = np.zeros((numOfSamples, 2))
+        eyesMetrics = np.empty((numOfSamples, 33))
+        frames = np.empty((numOfSamples, 40, 120))
+        mousePos = np.empty((numOfSamples, 2))
 
         for i, file in enumerate(samplesFilesNames):
             file = np.load(filesPath+file)
             eyesMetrics[i] = file['eyesMetrics']
-            frames[i] = cv2.resize(file['croppedFrame'], (120, 40))
+            resizedFrame = cv2.resize(file['croppedFrame'], (120, 40))
+            frames[i] = resizedFrame
             mousePos[i] = file['mousePos']
+            
+            # CorneaReader.__showFrameThenExit(frames[i], 3)
 
-        print(frames.shape)
 
         return (eyesMetrics, frames, mousePos)
 
     def __del__(self) -> None:
+        """dunder delete method to clean up class after finishing"""
         self.faceMesh.close()
 
 
@@ -167,3 +170,11 @@ class CorneaReader():
                                 borderType=cv2.BORDER_CONSTANT,
                                 value=(0, 0, 0))
         return image
+
+    @staticmethod
+    def __showFrameThenExit(frame: np.ndarray, sec: int) -> None:
+        """A debugging method used to show a frame for a number of seconds and exit do not use unless debugging only"""
+        cv2.imshow("frame", frame)
+        cv2.waitKey(sec*1000)
+        cv2.destroyAllWindows()
+        exit()
