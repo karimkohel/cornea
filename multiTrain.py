@@ -2,8 +2,8 @@ import tensorflow as tf
 from sklearn.model_selection import train_test_split
 import numpy as np
 from classes.cornea import CorneaReader
-
-eyesMetrics, frames, y = CorneaReader.preProcess('initTest')
+cr = CorneaReader()
+eyesMetrics, frames, y = cr.preProcess('initTest')
 
 convInput = tf.keras.layers.Input(shape=(40,120, 1), name="frames")
 denseInput = tf.keras.layers.Input(shape=(33), name='eyesMetrics')

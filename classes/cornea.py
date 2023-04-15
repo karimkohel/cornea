@@ -169,7 +169,7 @@ class CorneaReader():
                                 value=(0, 0, 0))
         return image
 
-    def __showFrameThenExit(frame: np.ndarray, sec: int) -> None:
+    def __showFrameThenExit(self, frame: np.ndarray, sec: int) -> None:
         """A debugging method used to show a frame for a number of seconds and exit do not use unless debugging only"""
         cv2.imshow("frame", frame)
         cv2.waitKey(sec*1000)
