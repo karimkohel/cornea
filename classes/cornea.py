@@ -112,21 +112,22 @@ class CorneaReader():
             for i, file in enumerate(samplesFilesNames):
                 file = np.load(filesPath+file)
                 eyesMetrics[i] = file['eyesMetrics']
-                resizedFrame = self.resizeAspectRatio(file['croppedFrame'])
+                resizedFrame = self.__resizeAspectRatio(file['croppedFrame'])
                 frames.append(resizedFrame)
                 mousePos[i] = file['mousePos']
             frames = np.array(frames)
 
             return (eyesMetrics, frames, mousePos)
         else:
-            return self.resizeAspectRatio(frame)
+            return self.__resizeAspectRatio(frame)
 
     def __del__(self) -> None:
         """dunder delete method to clean up class after finishing"""
         self.faceMesh.close()
 
 
-    def resizeAspectRatio(self, image):
+    def __resizeAspectRatio(self, image: np.ndarray) -> np.ndarray:
+        """method to take input as a cropped frame with any dimension and then resize and zero fill it to the correct ration"""
         widthPerc = 0
         heightPerc = 0
         
@@ -148,11 +149,11 @@ class CorneaReader():
         dim = (width, height)
         image = cv2.resize(image, dim, interpolation = cv2.INTER_AREA)
 
-        image = self.paddingRestOfImage(image)   
+        image = self.__paddingRestOfImage(image)   
         
         return image
     
-    def paddingRestOfImage(self, image):
+    def __paddingRestOfImage(self, image: np.ndarray) -> np.ndarray:
         # Get the current size of the image
         current_size = image.shape[:2]
 
