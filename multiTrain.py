@@ -4,7 +4,7 @@ import numpy as np
 from classes.cornea import CorneaReader
 cr = CorneaReader()
 
-eyesMetrics, frames, y = cr.preProcess('initTest')
+eyesMetrics, frames, y = cr.preProcess('realTest')
 
 convInput = tf.keras.layers.Input(shape=(40,120, 1), name="frames")
 denseInput = tf.keras.layers.Input(shape=(33), name='eyesMetrics')
@@ -25,15 +25,17 @@ model.compile(
     optimizer=tf.keras.optimizers.Adam(),
     metrics=['accuracy']
 )
-model.summary()
 
 model.fit(
     {"eyesMetrics": eyesMetrics, "frames": frames},
     {"mousePos": y},
-    epochs=100,
+    epochs=15,
     verbose=1,
-    batch_size=24
+    batch_size=24,
+    validation_split=0.1
 )
+
+model.save("models/convModelTest1.h5")
 
 
 # keras.utils.plot_model(model, "multi_input_and_output_model.png", show_shapes=True)
