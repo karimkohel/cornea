@@ -9,14 +9,17 @@ eyesMetrics, frames, y = cr.preProcess('realTest')
 convInput = tf.keras.layers.Input(shape=(40,120, 1), name="frames")
 denseInput = tf.keras.layers.Input(shape=(33), name='eyesMetrics')
 
-x = tf.keras.layers.Conv2D(32, (3,3), activation='relu', input_shape=convInput.shape)(convInput)
-x = tf.keras.layers.MaxPool2D()(x)
-x = tf.keras.layers.Conv2D(12, (3,3), activation='relu', input_shape=x.shape)(x)
-x = tf.keras.layers.MaxPool2D()(x)
-x = tf.keras.layers.Flatten()(x)
-x = tf.keras.layers.concatenate([x, denseInput])
-x = tf.keras.layers.Dense(160, activation='relu')(x)
-x = tf.keras.layers.Dense(20, activation='relu')(x)
+x1 = tf.keras.layers.Conv2D(32, (3,3), activation='relu', input_shape=convInput.shape)(convInput)
+x1 = tf.keras.layers.MaxPool2D()(x1)
+x1 = tf.keras.layers.Conv2D(32, (3,3), activation='relu', input_shape=x.shape)(x1)
+x1 = tf.keras.layers.MaxPool2D()(x1)
+x1 = tf.keras.layers.Flatten()(x1)
+
+x2 = tf.keras.layers.Dense(80, activation='relu')(denseInput)
+
+x = tf.keras.layers.concatenate([x1, x2])
+x = tf.keras.layers.Dense(120, activation='relu')(x)
+x = tf.keras.layers.Dense(60, activation='relu')(x)
 output = tf.keras.layers.Dense(2, activation='relu', name="mousePos")(x)
 
 model = tf.keras.Model(inputs=[convInput, denseInput], outputs=output, name='nesqafe2x1')
@@ -25,7 +28,6 @@ model.compile(
     optimizer=tf.keras.optimizers.Adam(),
     metrics=['accuracy']
 )
-
 model.fit(
     {"eyesMetrics": eyesMetrics, "frames": frames},
     {"mousePos": y},
