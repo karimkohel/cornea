@@ -100,23 +100,26 @@ class CorneaReader():
             os.mkdir(f"data/{saveDir}")
         np.savez(f"data/{saveDir}/{i}", eyesMetrics=eyesMetrics, croppedFrame=croppedFrame, mousePos=mousePos)
 
-    def preProcess(self, dataDir: str) -> np.ndarray:
+    def preProcess(self, dataDir: str = None, frame: np.ndarray = None) -> np.ndarray:
         """static method to load the image and metrics data from a given directory"""
-        filesPath = f"data/{dataDir}/"
-        samplesFilesNames = os.listdir(filesPath)
-        eyesMetrics = np.empty((len(samplesFilesNames), 33))
-        frames = []
-        mousePos = np.empty((len(samplesFilesNames), 2))
+        if dataDir:
+            filesPath = f"data/{dataDir}/"
+            samplesFilesNames = os.listdir(filesPath)
+            eyesMetrics = np.empty((len(samplesFilesNames), 33))
+            frames = []
+            mousePos = np.empty((len(samplesFilesNames), 2))
 
-        for i, file in enumerate(samplesFilesNames):
-            file = np.load(filesPath+file)
-            eyesMetrics[i] = file['eyesMetrics']
-            resizedFrame = self.resizeAspectRatio(file['croppedFrame'])
-            frames.append(resizedFrame)
-            mousePos[i] = file['mousePos']
-        frames = np.array(frames)
+            for i, file in enumerate(samplesFilesNames):
+                file = np.load(filesPath+file)
+                eyesMetrics[i] = file['eyesMetrics']
+                resizedFrame = self.resizeAspectRatio(file['croppedFrame'])
+                frames.append(resizedFrame)
+                mousePos[i] = file['mousePos']
+            frames = np.array(frames)
 
-        return (eyesMetrics, frames, mousePos)
+            return (eyesMetrics, frames, mousePos)
+        else:
+            return self.resizeAspectRatio(frame)
 
     def __del__(self) -> None:
         """dunder delete method to clean up class after finishing"""

@@ -6,24 +6,24 @@ from classes.cornea import CorneaReader
 
 cap = cv2.VideoCapture(0)
 cornea = CorneaReader()
-model = tf.keras.models.load_model('models/laptopModel2.h5')
+model = tf.keras.models.load_model('models/convModelTest1.h5')
 
 while True:
 
 
-    x = None
+    inputFrames = []
+    inputMetrics = []
     i=0
-    while i<10:
+    while i<5:
+        i = i + 1
         ret, frame = cap.read()
-        sample, frame = cornea.readEyes(frame)
-        if type(sample) == np.ndarray:
-            i = i + 1
-            if type(x) != np.ndarray:
-                x = sample[:33]
-            else:
-                x = np.vstack([x, sample[:33]])
+        (eyeMetrics, inputFrame), frame = cornea.readEyes(frame)
+        inputFrames.append(cornea.preProcess(frame=inputFrame))
+        inputMetrics.append(eyeMetrics)
 
-    predictions = model.predict(x)
+    inputMetrics = np.array(inputMetrics)
+    inputFrames = np.array(inputFrames)
+    predictions = model.predict([inputFrames, inputMetrics])
     coordinates = np.average(predictions, axis=0)
     print(coordinates)
     pyautogui.moveTo(coordinates[0], coordinates[1])
