@@ -16,14 +16,21 @@ class CorneaReader():
 
     EYESTRIP = [27, 28, 56, 190, 243, 112, 26, 22, 23, 24, 110, 25, 130, 247, 30, 29, 257, 259, 260, 467, 359, 255, 339, 254, 253, 252, 256, 341, 463, 414, 286, 258]
     TARGET = [40, 120]
+    CAMWIDTH = None
+    CAMHIGHT = None
 
-    def __init__(self) -> None:
+    def __init__(self, cap: any) -> None:
         """Start the facemesh solution and be ready to read eye values & fetch eye images
 
+        Input:
+        --------
+        cap: required, the cap object acquired from cv2.VideoCapture and used to read camera frames
         """
         mp_face_mesh = mp.solutions.face_mesh
         self.faceMesh = mp_face_mesh.FaceMesh(max_num_faces=1, refine_landmarks=True, min_detection_confidence=0.5, min_tracking_confidence=0.5)
         self.data = None
+        self.CAMWIDTH = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        self.CAMHIGHT = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
     def readEyes(self, frame: np.ndarray, saveDir: str = None) -> np.ndarray:
         """Method to derive all eye points needed from a frame
@@ -56,20 +63,13 @@ class CorneaReader():
             meshPoints = np.array([np.multiply([p.x, p.y], [imgWidth, imgHeigh]).astype(int) for p in results.multi_face_landmarks[0].landmark])
 
             # frame = self.__visualize(frame, meshPoints, meshPoints[self.LEFT_IRIS_CENTER], meshPoints[self.RIGHT_IRIS_CENTER]) # NOT FOR PRODUCTION
-            croppedFrame = self.__cropEye(frame, meshPoints)
-
-            leftIrisDistances = np.linalg.norm(meshPoints[self.LEFT_EYE] - meshPoints[self.LEFT_IRIS_CENTER], axis=1)
-            rightIrisDistances = np.linalg.norm(meshPoints[self.RIGHT_EYE] - meshPoints[self.RIGHT_IRIS_CENTER], axis=1)
-            middleEyeDistance = np.linalg.norm(meshPoints[self.RIGHT_EYE[0]] - meshPoints[self.LEFT_EYE[0]])
-            eyesMetrics = np.concatenate((leftIrisDistances, rightIrisDistances, [middleEyeDistance]))
-            frame = croppedFrame
+            frame = self.__cropEye(frame, meshPoints)
+            eyesMetrics = self.__calcEyeMetrics(meshPoints)
 
             if saveDir:
-                self.__saveDataArray(eyesMetrics, croppedFrame, mousePos, saveDir)
+                self.__saveDataArray(eyesMetrics, frame, mousePos, saveDir)
 
-            # croppedFrame = self.resizeAspectRatio(croppedFrame)
-            
-            return (eyesMetrics, croppedFrame), frame
+            return (eyesMetrics, frame), frame
         
         return None, frame
 
@@ -80,6 +80,16 @@ class CorneaReader():
         cv2.circle(frame, rightCenter, 1, (0,255,0), 3)
 
         return frame
+
+    def __calcEyeMetrics(self, meshPoints: np.ndarray) -> np.ndarray:
+        """Method to take in the meshpoints and calculate all the features we need from eye metrics as normalized eye distances from cornea"""
+
+
+        leftIrisDistances = np.linalg.norm(meshPoints[self.LEFT_EYE] - meshPoints[self.LEFT_IRIS_CENTER], axis=1)
+        rightIrisDistances = np.linalg.norm(meshPoints[self.RIGHT_EYE] - meshPoints[self.RIGHT_IRIS_CENTER], axis=1)
+        middleEyeDistance = np.linalg.norm(meshPoints[self.RIGHT_EYE[0]] - meshPoints[self.LEFT_EYE[0]])
+        eyesMetrics = np.concatenate((leftIrisDistances, rightIrisDistances, [middleEyeDistance]))
+        return eyesMetrics
 
     def __cropEye(self, frame: np.ndarray, meshPoints: np.ndarray) -> np.ndarray:
         """private method to take in the entire frame and crop the eyestrip with max enclosure"""
