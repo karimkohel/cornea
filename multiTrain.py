@@ -1,8 +1,9 @@
 import tensorflow as tf
 from classes.cornea import CorneaReader
+import cv2
 
-
-cr = CorneaReader()
+cap = cv2.VideoCapture(1)
+cr = CorneaReader(cap)
 eyesMetrics, frames, y = cr.preProcess('realTest')
 
 convInput = tf.keras.layers.Input(shape=(40,120, 1), name="frames")
