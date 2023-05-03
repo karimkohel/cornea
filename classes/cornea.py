@@ -90,13 +90,14 @@ class CorneaReader():
         middleEyeDistance = np.linalg.norm(meshPoints[self.RIGHT_EYE[0]] - meshPoints[self.LEFT_EYE[0]])
         eyesMetrics = np.concatenate((leftIrisDistances, rightIrisDistances, [middleEyeDistance]))
 
-        fullCamScale = np.linalg.norm(np.array((0,0)) - np.array((self.CAMWIDTH, self.CAMHIGHT)))
-        ratios = leftIrisDistances/fullCamScale
+        # for standard scaling later
+        # fullCamScale = np.linalg.norm(np.array((0,0)) - np.array((self.CAMWIDTH, self.CAMHIGHT)))
+        # ratios = leftIrisDistances/fullCamScale
 
-        print(leftIrisDistances[3])
+        # print(leftIrisDistances[3])
 
-        print(fullCamScale)
-        print(ratios[3])
+        # print(fullCamScale)
+        # print(ratios[3])
 
         print('==============================================')
         return eyesMetrics
