@@ -50,12 +50,14 @@ class CorneaReader():
         --------------
         frame, (left, right, middle)
         """
+
         mousePos = pyautogui.position()
         frame = cv2.flip(frame, 1)
         frameRGB = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         imgHeigh, imgWidth = frame.shape[:2]
         results = self.faceMesh.process(frameRGB)
+        self.CAMWIDTH, self.CAMHIGHT = frame.shape[0:2]
 
         if results.multi_face_landmarks:
             meshPoints = np.array([np.multiply([p.x, p.y], [imgWidth, imgHeigh]).astype(int) for p in results.multi_face_landmarks[0].landmark])
@@ -87,6 +89,16 @@ class CorneaReader():
         rightIrisDistances = np.linalg.norm(meshPoints[self.RIGHT_EYE] - meshPoints[self.RIGHT_IRIS_CENTER], axis=1)
         middleEyeDistance = np.linalg.norm(meshPoints[self.RIGHT_EYE[0]] - meshPoints[self.LEFT_EYE[0]])
         eyesMetrics = np.concatenate((leftIrisDistances, rightIrisDistances, [middleEyeDistance]))
+
+        fullCamScale = np.linalg.norm(np.array((0,0)) - np.array((self.CAMWIDTH, self.CAMHIGHT)))
+        ratios = leftIrisDistances/fullCamScale
+
+        print(leftIrisDistances[3])
+
+        print(fullCamScale)
+        print(ratios[3])
+
+        print('==============================================')
         return eyesMetrics
 
     def __cropEye(self, frame: np.ndarray, meshPoints: np.ndarray) -> np.ndarray:
