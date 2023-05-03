@@ -132,14 +132,14 @@ class CorneaReader():
             for i, file in enumerate(samplesFilesNames):
                 file = np.load(filesPath+file)
                 eyesMetrics[i] = file['eyesMetrics']
-                resizedFrame = self.__resizeAspectRatio(file['croppedFrame'])
+                resizedFrame = self.__paddingRestOfImage(file['croppedFrame'])
                 frames.append(resizedFrame)
                 mousePos[i] = file['mousePos']
             frames = np.array(frames)
 
             return (eyesMetrics, frames, mousePos)
         else:
-            return self.__resizeAspectRatio(frame)
+            return self.__paddingRestOfImage(frame)
 
     def __del__(self) -> None:
         """dunder delete method to clean up class after finishing"""

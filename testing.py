@@ -1,12 +1,15 @@
 import cv2
 from classes.cornea import CorneaReader
 import numpy as np
-import time
+import time 
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
+# cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+# cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 cornea = CorneaReader(cap)
 
 print("started")
+
 
 ret, frameOrg = cap.read()
 
@@ -16,6 +19,7 @@ if ret:
 
     downFrame = cv2.pyrDown(frameOrg)
     _, downFrame = cornea.readEyes(downFrame, 'metricsTest')
+    cv2.imshow("original frame ", frameOrg)
 
     cv2.imshow("Frame", upFrame)
     cv2.imshow("downFrame", downFrame)
