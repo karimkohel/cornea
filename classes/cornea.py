@@ -15,7 +15,7 @@ class CorneaReader():
     RIGHT_IRIS_CENTER = 468
 
     EYESTRIP = [27, 28, 56, 190, 243, 112, 26, 22, 23, 24, 110, 25, 130, 247, 30, 29, 257, 259, 260, 467, 359, 255, 339, 254, 253, 252, 256, 341, 463, 414, 286, 258]
-    TARGET = [40, 120]
+    TARGET_IMG_SIZE = [40, 120]
 
     def __init__(self, cap: any) -> None:
         """Start the facemesh solution and be ready to read eye values & fetch eye images
@@ -63,7 +63,10 @@ class CorneaReader():
             meshPoints = np.array([np.multiply([p.x, p.y], [imgWidth, imgHeigh]).astype(int) for p in results.multi_face_landmarks[0].landmark])
 
             # frame = self.__visualize(frame, meshPoints, meshPoints[self.LEFT_IRIS_CENTER], meshPoints[self.RIGHT_IRIS_CENTER]) # NOT FOR PRODUCTION
-            frame = self.__cropEye(frame, meshPoints)
+            ret, frame = self.__cropEye(frame, meshPoints)
+            if not ret:
+                print("unaccepted frame")
+                return None, frame
             eyesMetrics = self.__calcEyeMetrics(meshPoints)
 
             if saveDir:
@@ -99,7 +102,6 @@ class CorneaReader():
         # print(fullCamScale)
         # print(ratios[3])
 
-        print('==============================================')
         return eyesMetrics
 
     def __cropEye(self, frame: np.ndarray, meshPoints: np.ndarray) -> np.ndarray:
@@ -108,7 +110,10 @@ class CorneaReader():
         maxX, maxY = np.amax(eyeStripCoordinates, axis=0)
         minX, minY = np.amin(eyeStripCoordinates, axis=0)
         frame = frame[minY:maxY, minX:maxX]
-        return frame
+        if (frame.shape[:2][0] > 400) or (frame.shape[:2][1] > 400) or (frame.shape[:2][0] > frame.shape[:2][1]):
+            return False, frame
+        print(frame.shape[:2])
+        return True, frame
 
 
     def __saveDataArray(self, eyesMetrics: np.ndarray, croppedFrame: np.ndarray, mousePos: list[int], saveDir: str) -> None:
@@ -153,11 +158,11 @@ class CorneaReader():
         heightPerc = 0
         
 
-        heightPerc = self.TARGET[0] - image.shape[0]
-        widthPerc = self.TARGET[1] - image.shape[1]
+        heightPerc = self.TARGET_IMG_SIZE[0] - image.shape[0]
+        widthPerc = self.TARGET_IMG_SIZE[1] - image.shape[1]
 
-        heightPerc = heightPerc * 100 / self.TARGET[0]
-        widthPerc = widthPerc * 100 / self.TARGET[1]
+        heightPerc = heightPerc * 100 / self.TARGET_IMG_SIZE[0]
+        widthPerc = widthPerc * 100 / self.TARGET_IMG_SIZE[1]
 
         if heightPerc < widthPerc:
             scale_percent = heightPerc
@@ -165,8 +170,8 @@ class CorneaReader():
         else:
             scale_percent = widthPerc        
 
-        width = image.shape[1] + int(self.TARGET[1] * scale_percent / 100)
-        height = image.shape[0] + int(self.TARGET[0] * scale_percent / 100)
+        width = image.shape[1] + int(self.TARGET_IMG_SIZE[1] * scale_percent / 100)
+        height = image.shape[0] + int(self.TARGET_IMG_SIZE[0] * scale_percent / 100)
         dim = (width, height)
         image = cv2.resize(image, dim, interpolation = cv2.INTER_AREA)
 
@@ -179,8 +184,8 @@ class CorneaReader():
         current_size = image.shape[:2]
 
         # Compute the amount of padding needed
-        padding_width = self.TARGET[1] - current_size[1]
-        padding_height = self.TARGET[0] - current_size[0]
+        padding_width = self.TARGET_IMG_SIZE[1] - current_size[1]
+        padding_height = self.TARGET_IMG_SIZE[0] - current_size[0]
         
         image = cv2.copyMakeBorder(image,
                                 top=0,
