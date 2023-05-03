@@ -16,8 +16,6 @@ class CorneaReader():
 
     EYESTRIP = [27, 28, 56, 190, 243, 112, 26, 22, 23, 24, 110, 25, 130, 247, 30, 29, 257, 259, 260, 467, 359, 255, 339, 254, 253, 252, 256, 341, 463, 414, 286, 258]
     TARGET = [40, 120]
-    CAMWIDTH = None
-    CAMHIGHT = None
 
     def __init__(self, cap: any) -> None:
         """Start the facemesh solution and be ready to read eye values & fetch eye images
@@ -102,11 +100,11 @@ class CorneaReader():
 
     def __saveDataArray(self, eyesMetrics: np.ndarray, croppedFrame: np.ndarray, mousePos: list[int], saveDir: str) -> None:
         """private method that would save data arrays to memory based on input to read eyes method and current data index"""
-        i = 0
         try:
             prevDataFiles = os.listdir(f"data/{saveDir}")
             i = len(prevDataFiles)
         except FileNotFoundError:
+            i = 0
             os.mkdir(f"data/{saveDir}")
         np.savez(f"data/{saveDir}/{i}", eyesMetrics=eyesMetrics, croppedFrame=croppedFrame, mousePos=mousePos)
 
