@@ -15,7 +15,7 @@ class CorneaReader():
     RIGHT_IRIS_CENTER = 468
 
     EYESTRIP = [27, 28, 56, 190, 243, 112, 26, 22, 23, 24, 110, 25, 130, 247, 30, 29, 257, 259, 260, 467, 359, 255, 339, 254, 253, 252, 256, 341, 463, 414, 286, 258]
-    TARGET_IMG_SIZE = [40, 120]
+    TARGET_IMG_SIZE = [155, 155]
 
     def __init__(self, cap: any) -> None:
         """Start the facemesh solution and be ready to read eye values & fetch eye images
@@ -110,7 +110,7 @@ class CorneaReader():
         maxX, maxY = np.amax(eyeStripCoordinates, axis=0)
         minX, minY = np.amin(eyeStripCoordinates, axis=0)
         frame = frame[minY:maxY, minX:maxX]
-        if (frame.shape[:2][0] > 400) or (frame.shape[:2][1] > 400) or (frame.shape[:2][0] > frame.shape[:2][1]):
+        if (frame.shape[:2][0] > self.TARGET_IMG_SIZE[0]) or (frame.shape[:2][1] > self.TARGET_IMG_SIZE[1]) or (frame.shape[:2][0] > frame.shape[:2][1]):
             return False, frame
         print(frame.shape[:2])
         return True, frame
