@@ -3,7 +3,7 @@ from classes.cornea import CorneaReader
 import numpy as np
 
 cap = cv2.VideoCapture(0)
-cornea = CorneaReader(cap)
+cornea = CorneaReader()
 
 print("started")
 while True:

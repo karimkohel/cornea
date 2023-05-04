@@ -17,18 +17,12 @@ class CorneaReader():
     EYESTRIP = [27, 28, 56, 190, 243, 112, 26, 22, 23, 24, 110, 25, 130, 247, 30, 29, 257, 259, 260, 467, 359, 255, 339, 254, 253, 252, 256, 341, 463, 414, 286, 258]
     TARGET_IMG_SIZE = [50, 120]
 
-    def __init__(self, cap: any) -> None:
+    def __init__(self) -> None:
         """Start the facemesh solution and be ready to read eye values & fetch eye images
-
-        Input:
-        --------
-        cap: required, the cap object acquired from cv2.VideoCapture and used to read camera frames
         """
         mp_face_mesh = mp.solutions.face_mesh
         self.faceMesh = mp_face_mesh.FaceMesh(max_num_faces=1, refine_landmarks=True, min_detection_confidence=0.5, min_tracking_confidence=0.5)
         self.data = None
-        self.CAMWIDTH = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        self.CAMHIGHT = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
     def readEyes(self, frame: np.ndarray, saveDir: str = None) -> np.ndarray:
         """Method to derive all eye points needed from a frame

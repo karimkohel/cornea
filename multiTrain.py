@@ -1,11 +1,7 @@
 import tensorflow as tf
 from classes.cornea import CorneaReader
-import cv2
 
-cap = cv2.VideoCapture(0)
-cr = CorneaReader(cap)
-cap.release()
-
+cr = CorneaReader()
 eyesMetrics, frames, y = cr.preProcess('tataHome')
 
 convInput = tf.keras.layers.Input(shape=(cr.TARGET_IMG_SIZE[0],cr.TARGET_IMG_SIZE[1], 1), name="frames")
