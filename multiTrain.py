@@ -2,11 +2,13 @@ import tensorflow as tf
 from classes.cornea import CorneaReader
 import cv2
 
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 cr = CorneaReader(cap)
+cap.release()
+
 eyesMetrics, frames, y = cr.preProcess('realTest')
 
-convInput = tf.keras.layers.Input(shape=(40,120, 1), name="frames")
+convInput = tf.keras.layers.Input(shape=(cr.TARGET_IMG_SIZE[0],cr.TARGET_IMG_SIZE[1], 1), name="frames")
 denseInput = tf.keras.layers.Input(shape=(33), name='eyesMetrics')
 
 x1 = tf.keras.layers.Conv2D(42, (3,3), activation='relu', input_shape=convInput.shape)(convInput)
