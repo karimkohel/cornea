@@ -11,7 +11,7 @@ while True:
     ret, frame = cap.read()
 
     if ret:
-        _, frame = cornea.readEyes(frame, 'tataLaptop')
+        _, frame = cornea.readEyes(frame, 'tataHome')
 
         key = cv2.waitKey(5)
         if key == ord('q'):
