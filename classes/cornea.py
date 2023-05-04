@@ -15,7 +15,7 @@ class CorneaReader():
     RIGHT_IRIS_CENTER = 468
 
     EYESTRIP = [27, 28, 56, 190, 243, 112, 26, 22, 23, 24, 110, 25, 130, 247, 30, 29, 257, 259, 260, 467, 359, 255, 339, 254, 253, 252, 256, 341, 463, 414, 286, 258]
-    TARGET_IMG_SIZE = [155, 155]
+    TARGET_IMG_SIZE = [50, 120]
 
     def __init__(self, cap: any) -> None:
         """Start the facemesh solution and be ready to read eye values & fetch eye images
@@ -142,6 +142,8 @@ class CorneaReader():
                 frames.append(resizedFrame)
                 mousePos[i] = file['mousePos']
             frames = np.array(frames)
+
+            self.__showFrameThenExit(frames[2], 10)
 
             return (eyesMetrics, frames, mousePos)
         else:
