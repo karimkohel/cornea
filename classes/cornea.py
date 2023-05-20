@@ -3,6 +3,7 @@ import mediapipe as mp
 import numpy as np
 import os, time
 import pyautogui
+from numpy import savez_compressed
 
 
 class CorneaReader():
@@ -136,9 +137,11 @@ class CorneaReader():
                 frames.append(resizedFrame)
                 mousePos[i] = file['mousePos']
             frames = np.array(frames)
-
+        
             self.__showFrameThenExit(frames[2], 10)
-
+            all_data = tuple(eyesMetrics , frames , mousePos)
+            all_data = np.array(all_data)
+            savez_compressed('all_data.npz', all_data)
             return (eyesMetrics, frames, mousePos)
         else:
             return self.__paddingRestOfImage(frame)
