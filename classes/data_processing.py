@@ -1,48 +1,45 @@
-
 #this is pseudo code just thinking kda to scape form my inside 
 #having file contain [(frame,array_of_points,mospos),(frame,array_of_points,mospos)]
 #we need to create two approaches 1- make generators 2- use tf pipelining on each batch 
-import tensorflow as tf
+import cornea 
+import tensorflow as tf 
+import numpy as np
+import cv2
+import os
+
+
+
 class CustomDataGen(tf.keras.utils.Sequence):
-     def __init__(self, df, X_col(frames,array_of_points), y_col(mospos),
-                 batch_size,
-                 input_size=(224, 224, 3)
-                 ):
-          
-        self.df = df.copy()
-        self.X_col = X_col
-        self.y_col = y_col
+    def __init__(self, batch_size: int = 10000):
+        
         self.batch_size = batch_size
-        self.input_size = input_size
+        
+    def on_epoch_end(self):
+        if self.shuffle:
+            self.df = self.df.sample(frac=1).reset_index(drop=True)
+    
+    def __get_input(self, path, bbox, target_size):
+    
+        xmin, ymin, w, h = bbox['x'], bbox['y'], bbox['width'], bbox['height']
 
+        image = tf.keras.preprocessing.image.load_img(path)
+        image_arr = tf.keras.preprocessing.image.img_to_array(image)
 
-        self.n = len(self.df)
-        self.n_name = df[y_col['name']].nunique()
-        self.n_type = df[y_col['type']].nunique()        #msh fahm awi hoa 3ayz ywsl l2eh bs okay 
+        image_arr = image_arr[ymin:ymin+h, xmin:xmin+w]
+        image_arr = tf.image.resize(image_arr,(target_size[0], target_size[1])).numpy()
 
-    #function to generate one batch of data 
-    def __get_input(self, path, bbox, target_size): 
-    #here we will make the pre processing on the data 
-
-    xmin, ymin, w, h = bbox['x'], bbox['y'], bbox['width'], bbox['height']
-
-    image = tf.keras.preprocessing.image.load_img(path)
-    image_arr = tf.keras.preprocessing.image.img_to_array(image)
-
-    image_arr = image_arr[ymin:ymin+h, xmin:xmin+w]
-    image_arr = tf.image.resize(image_arr,(target_size[0], target_size[1])).numpy()
-
-    return image_arr/255.    
-
-
-
+        return image_arr/255.
+    
+    def __get_output(self, label, num_classes):
+        return tf.keras.utils.to_categorical(label, num_classes=num_classes)
+    
     def __get_data(self, batches):
         # Generates data containing batch_size samples
 
-        path_batch = batches[self.X_col['path']] #dh al mfrod mkan al sora
-        bbox_batch = batches[self.X_col['bbox']] # al sora al mfrod kman wal array_data
+        path_batch = batches[self.X_col['path']]
+        bbox_batch = batches[self.X_col['bbox']]
         
-        name_batch = batches[self.y_col['name']] #mospos bs
+        name_batch = batches[self.y_col['name']]
         type_batch = batches[self.y_col['type']]
 
         X_batch = np.asarray([self.__get_input(x, y, self.input_size) for x, y in zip(path_batch, bbox_batch)])
@@ -59,18 +56,8 @@ class CustomDataGen(tf.keras.utils.Sequence):
         return X, y
     
     def __len__(self):
-        return self.n // self.batch_size 
-    
-    traingen = CustomDataGen(train_df,
-                         X_col={'path':'filename', 'bbox': 'region_shape_attributes'},
-                         y_col={'name': 'name', 'type': 'type'},
-                         batch_size=batch_siz, input_size=target_size)
-                                                                                            #model 
-    valgen = CustomDataGen(val_df,
-                       X_col={'path':'filename', 'bbox': 'region_shape_attributes'},
-                       y_col={'name': 'name', 'type': 'type'},
-                       batch_size=batch_siz, input_size=target_size)
+        return self.n // self.batch_size
 
-    model.fit(traingen,
-          validation_data=valgen,
-          epochs=num_epochs)
+
+
+z= DataGen.preProcess('ososHome')
