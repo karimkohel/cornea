@@ -45,7 +45,7 @@ class CorneaReader():
         --------------
         frame, (left, right, middle)
         """
-
+        self.saveDir = saveDir
         mousePos = pyautogui.position()
         frame = cv2.flip(frame, 1)
         frameRGB = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -119,6 +119,8 @@ class CorneaReader():
         except FileNotFoundError:
             i = 0
             os.mkdir(f"data/{saveDir}")
+
+        self.savedSampleCount = i
         np.savez(f"data/{saveDir}/{i}", eyesMetrics=eyesMetrics, croppedFrame=croppedFrame, mousePos=mousePos)
 
     def preProcess(self, dataDir: str = None, frame: np.ndarray = None) -> np.ndarray:
@@ -201,3 +203,8 @@ class CorneaReader():
         cv2.waitKey(sec*1000)
         cv2.destroyAllWindows()
         exit()
+
+
+    def saveMetaData(self):
+        with open(f"data/{self.saveDir}/sampleCount.txt", "w") as f:
+            f.write(str(self.savedSampleCount))

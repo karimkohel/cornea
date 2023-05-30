@@ -18,5 +18,7 @@ while True:
             break
         cv2.imshow("Frame", frame)
 
+
+cornea.savedSampleCount()
 cap.release()
 cv2.destroyAllWindows()
