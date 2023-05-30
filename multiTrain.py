@@ -7,6 +7,8 @@ eyesMetrics, frames, y = cr.preProcess('tataHome')
 convInput = tf.keras.layers.Input(shape=(cr.TARGET_IMG_SIZE[0],cr.TARGET_IMG_SIZE[1], 1), name="frames")
 denseInput = tf.keras.layers.Input(shape=(33), name='eyesMetrics')
 
+traingen = CustomDataGen(train_df, batch_size=batch_siz, input_size=target_size)
+
 x1 = tf.keras.layers.Conv2D(42, (3,3), activation='relu', input_shape=convInput.shape)(convInput)
 x1 = tf.keras.layers.MaxPool2D()(x1)
 x1 = tf.keras.layers.Conv2D(42, (3,3), activation='relu', input_shape=x1.shape)(x1)
