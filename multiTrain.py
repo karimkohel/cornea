@@ -2,7 +2,7 @@ import tensorflow as tf
 from classes.cornea import CorneaReader
 
 cr = CorneaReader()
-eyesMetrics, frames, y = cr.preProcess('tataHome')
+eyesMetrics, frames, y = cr.loadData('tataHome')
 
 convInput = tf.keras.layers.Input(shape=(cr.TARGET_IMG_SIZE[0],cr.TARGET_IMG_SIZE[1], 1), name="frames")
 denseInput = tf.keras.layers.Input(shape=(33), name='eyesMetrics')
