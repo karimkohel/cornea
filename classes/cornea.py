@@ -128,6 +128,30 @@ class CorneaReader():
         if dataDir:
             filesPath = f"data/{dataDir}/"
             samplesFilesNames = os.listdir(filesPath)
+            #eyesMetrics = np.empty((len(samplesFilesNames), 33))
+            #frames = []
+            #mousePos = np.empty((len(samplesFilesNames), 2))
+
+            for i, file in enumerate(samplesFilesNames):
+                file = np.load(filesPath+file)
+                #eyesMetrics[i] = file['eyesMetrics']
+                resizedFrame = self.__paddingRestOfImage(file['croppedFrame'])
+                np.savez(f"data/{dataDir}/{i}",croppedFrame=resizedFrame)
+                #frames.append(resizedFrame)
+                #mousePos[i] = file['mousePos']
+            #frames = np.array(frames)
+        
+            # all_data = tuple(eyesMetrics , frames , mousePos)
+            # all_data = np.array(all_data)
+            # savez_compressed('all_data.npz', all_data)
+            #return (eyesMetrics, frames, mousePos)
+        #else:
+            return self.__paddingRestOfImage(frame)
+        
+    def loadData(self, dataDir: str = None, frame: np.ndarray = None) -> np.ndarray:
+        if dataDir:
+            filesPath = f"data/{dataDir}/"
+            samplesFilesNames = os.listdir(filesPath)
             eyesMetrics = np.empty((len(samplesFilesNames), 33))
             frames = []
             mousePos = np.empty((len(samplesFilesNames), 2))
@@ -135,14 +159,10 @@ class CorneaReader():
             for i, file in enumerate(samplesFilesNames):
                 file = np.load(filesPath+file)
                 eyesMetrics[i] = file['eyesMetrics']
-                resizedFrame = self.__paddingRestOfImage(file['croppedFrame'])
-                frames.append(resizedFrame)
+                frames[i] = file['croppedFrame']                
                 mousePos[i] = file['mousePos']
             frames = np.array(frames)
         
-            # all_data = tuple(eyesMetrics , frames , mousePos)
-            # all_data = np.array(all_data)
-            # savez_compressed('all_data.npz', all_data)
             return (eyesMetrics, frames, mousePos)
         else:
             return self.__paddingRestOfImage(frame)
