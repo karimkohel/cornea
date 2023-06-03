@@ -123,30 +123,17 @@ class CorneaReader():
         self.savedSampleCount = i
         np.savez(f"data/{saveDir}/{i}", eyesMetrics=eyesMetrics, croppedFrame=croppedFrame, mousePos=mousePos)
 
-    def preProcess(self, dataDir: str = None, frame: np.ndarray = None) -> np.ndarray:
+    def preProcess(self, dataDir: str = None):
         """static method to load the image and metrics data from a given directory"""
         if dataDir:
             filesPath = f"data/{dataDir}/"
             samplesFilesNames = os.listdir(filesPath)
-            #eyesMetrics = np.empty((len(samplesFilesNames), 33))
-            #frames = []
-            #mousePos = np.empty((len(samplesFilesNames), 2))
 
             for i, file in enumerate(samplesFilesNames):
                 file = np.load(filesPath+file)
-                #eyesMetrics[i] = file['eyesMetrics']
                 resizedFrame = self.__paddingRestOfImage(file['croppedFrame'])
-                np.savez(f"data/{dataDir}/{i}",croppedFrame=resizedFrame)
-                #frames.append(resizedFrame)
-                #mousePos[i] = file['mousePos']
-            #frames = np.array(frames)
-        
-            # all_data = tuple(eyesMetrics , frames , mousePos)
-            # all_data = np.array(all_data)
-            # savez_compressed('all_data.npz', all_data)
-            #return (eyesMetrics, frames, mousePos)
-        #else:
-            return self.__paddingRestOfImage(frame)
+                np.savez(f"data/{dataDir}/{i}", eyesMetrics=file['eyesMetrics'], croppedFrame=resizedFrame, mousePos=file['mousePos'])
+
         
     def loadData(self, dataDir: str = None, frame: np.ndarray = None) -> np.ndarray:
         if dataDir:
