@@ -140,10 +140,9 @@ class CorneaReader():
                 mousePos[i] = file['mousePos']
             frames = np.array(frames)
         
-            self.__showFrameThenExit(frames[2], 10)
-            all_data = tuple(eyesMetrics , frames , mousePos)
-            all_data = np.array(all_data)
-            savez_compressed('all_data.npz', all_data)
+            # all_data = tuple(eyesMetrics , frames , mousePos)
+            # all_data = np.array(all_data)
+            # savez_compressed('all_data.npz', all_data)
             return (eyesMetrics, frames, mousePos)
         else:
             return self.__paddingRestOfImage(frame)
