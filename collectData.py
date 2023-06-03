@@ -11,7 +11,7 @@ while True:
     ret, frame = cap.read()
 
     if ret:
-        _, frame = cornea.readEyes(frame, 'tataHome')
+        _, frame = cornea.readEyes(frame, 'kkTest')
 
         key = cv2.waitKey(5)
         if key == ord('q'):
@@ -19,6 +19,5 @@ while True:
         cv2.imshow("Frame", frame)
 
 
-cornea.savedSampleCount()
 cap.release()
 cv2.destroyAllWindows()

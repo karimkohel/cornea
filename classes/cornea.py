@@ -146,7 +146,7 @@ class CorneaReader():
             for i, file in enumerate(samplesFilesNames):
                 file = np.load(filesPath+file)
                 eyesMetrics[i] = file['eyesMetrics']
-                frames[i] = file['croppedFrame']                
+                frames.append(file['croppedFrame'])                
                 mousePos[i] = file['mousePos']
             frames = np.array(frames)
         
