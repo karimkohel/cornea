@@ -14,6 +14,9 @@ class CorneaReader():
     RIGHT_EYE = [133, 33, 7, 163, 144, 145, 153, 154, 155, 173, 157, 158, 159, 160, 161, 246]
     LEFT_IRIS_CENTER = 473
     RIGHT_IRIS_CENTER = 468
+    FACE_CENTER = 6
+    
+    FACE_METRICS_LEN = 37
 
     EYESTRIP = [27, 28, 56, 190, 243, 112, 26, 22, 23, 24, 110, 25, 130, 247, 30, 29, 257, 259, 260, 467, 359, 255, 339, 254, 253, 252, 256, 341, 463, 414, 286, 258]
     TARGET_IMG_SIZE = [50, 120]
@@ -62,7 +65,8 @@ class CorneaReader():
             if not ret:
                 print("unaccepted frame")
                 return None, frame
-            eyesMetrics = self.__calcEyeMetrics(meshPoints)
+            eyesMetrics = self.__calcEyeMetrics(meshPoints, frame)
+
 
             if saveDir:
                 self.__saveDataArray(eyesMetrics, frame, mousePos, saveDir)
@@ -79,14 +83,17 @@ class CorneaReader():
 
         return frame
 
-    def __calcEyeMetrics(self, meshPoints: np.ndarray) -> np.ndarray:
+    def __calcEyeMetrics(self, meshPoints: np.ndarray, frame: np.ndarray) -> np.ndarray:
         """Method to take in the meshpoints and calculate all the features we need from eye metrics as normalized eye distances from cornea"""
 
 
         leftIrisDistances = np.linalg.norm(meshPoints[self.LEFT_EYE] - meshPoints[self.LEFT_IRIS_CENTER], axis=1)
         rightIrisDistances = np.linalg.norm(meshPoints[self.RIGHT_EYE] - meshPoints[self.RIGHT_IRIS_CENTER], axis=1)
         middleEyeDistance = np.linalg.norm(meshPoints[self.RIGHT_EYE[0]] - meshPoints[self.LEFT_EYE[0]])
-        eyesMetrics = np.concatenate((leftIrisDistances, rightIrisDistances, [middleEyeDistance]))
+        centerToEdgesDistances = np.linalg.norm(meshPoints[self.FACE_CENTER] - np.array([(0, 0), (0, frame.shape[1]), (0, frame.shape[0]), (frame.shape[1], frame.shape[0])]), axis=1)
+
+        eyesMetrics = np.concatenate((leftIrisDistances, rightIrisDistances, centerToEdgesDistances, [middleEyeDistance]))
+
 
         # for standard scaling later
         # fullCamScale = np.linalg.norm(np.array((0,0)) - np.array((self.CAMWIDTH, self.CAMHIGHT)))
@@ -107,7 +114,7 @@ class CorneaReader():
         frame = frame[minY:maxY, minX:maxX]
         if (frame.shape[:2][0] > self.TARGET_IMG_SIZE[0]) or (frame.shape[:2][1] > self.TARGET_IMG_SIZE[1]) or (frame.shape[:2][0] > frame.shape[:2][1]):
             return False, frame
-        print(frame.shape[:2])
+        # print(frame.shape[:2])
         return True, frame
 
 
@@ -139,7 +146,7 @@ class CorneaReader():
         if dataDir:
             filesPath = f"data/{dataDir}/"
             samplesFilesNames = os.listdir(filesPath)
-            eyesMetrics = np.empty((len(samplesFilesNames), 33))
+            eyesMetrics = np.empty((len(samplesFilesNames), self.FACE_METRICS_LEN))
             frames = []
             mousePos = np.empty((len(samplesFilesNames), 2))
 
