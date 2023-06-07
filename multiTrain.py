@@ -29,7 +29,7 @@ model.compile(
 
 model.summary()
 tensorboard = tf.keras.callbacks.TensorBoard(
-    log_dir="logs",
+    log_dir="modelLogs",
     histogram_freq=1
 )
 
