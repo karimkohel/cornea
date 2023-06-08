@@ -2,7 +2,7 @@ import tensorflow as tf
 from classes.cornea import CorneaReader
 
 cr = CorneaReader()
-eyesMetrics, frames, y = cr.loadData('kkTest')
+eyesMetrics, frames, y = cr.loadData('datesetTest')
 
 convInput = tf.keras.layers.Input(shape=(cr.TARGET_IMG_SIZE[0],cr.TARGET_IMG_SIZE[1], 1), name="frames")
 denseInput = tf.keras.layers.Input(shape=(cr.FACE_METRICS_LEN), name='eyesMetrics')
@@ -39,11 +39,12 @@ tensorboard = tf.keras.callbacks.TensorBoard(
 model.fit(
     {"eyesMetrics": eyesMetrics, "frames": frames},
     {"mousePosition": y},
-    epochs=35,
+    epochs=50,
     verbose=2,
     batch_size=24,
     validation_split=0.2,
-    callbacks=[tensorboard]
+    callbacks=[tensorboard],
+    shuffle=True
 )
 
 model.save("models/convModelTest1.h5")
