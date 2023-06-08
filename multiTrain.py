@@ -5,7 +5,7 @@ cr = CorneaReader()
 eyesMetrics, frames, y = cr.loadData('kkTest')
 
 convInput = tf.keras.layers.Input(shape=(cr.TARGET_IMG_SIZE[0],cr.TARGET_IMG_SIZE[1], 1), name="frames")
-denseInput = tf.keras.layers.Input(shape=(33), name='eyesMetrics')
+denseInput = tf.keras.layers.Input(shape=(cr.FACE_METRICS_LEN), name='eyesMetrics')
 
 x1 = tf.keras.layers.Conv2D(42, (3,3), activation='relu', input_shape=convInput.shape)(convInput)
 x1 = tf.keras.layers.MaxPool2D()(x1)
@@ -30,7 +30,9 @@ model.compile(
 model.summary()
 tensorboard = tf.keras.callbacks.TensorBoard(
     log_dir="modelLogs",
-    histogram_freq=1
+    histogram_freq=1,
+    update_freq='epoch',
+    write_graph=True
 )
 
 
