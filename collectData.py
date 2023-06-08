@@ -5,17 +5,31 @@ import numpy as np
 cap = cv2.VideoCapture(0)
 cornea = CorneaReader()
 
+
 print("started")
+
 while True:
 
     ret, frame = cap.read()
 
     if ret:
-        _, frame = cornea.readEyes(frame, 'kkTest')
 
-        key = cv2.waitKey(5)
+        key = cv2.waitKey(1)
+        if key == ord('s'):
+            break
+        cv2.imshow("Frame", frame)
+
+while True:
+
+    ret, frame = cap.read()
+
+    if ret:
+        _, croppedFrame = cornea.readEyes(frame, 'datesetTest')
+
+        key = cv2.waitKey(3)
         if key == ord('q'):
             break
+        cv2.imshow("cropped frame", croppedFrame)
         cv2.imshow("Frame", frame)
 
 
