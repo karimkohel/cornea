@@ -3,10 +3,16 @@ import tensorflow as tf
 import pyautogui
 import cv2
 from classes.cornea import CorneaReader
+import time
 
 cap = cv2.VideoCapture(0)
 cornea = CorneaReader()
 model = tf.keras.models.load_model('models/convModelTest1.h5')
+
+
+for i in range(50):
+    _, frame = cap.read()
+
 
 while True:
 
@@ -14,11 +20,11 @@ while True:
     inputFrames = []
     inputMetrics = []
     i=0
-    while i<5:
+    while i<3:
         i = i + 1
         ret, frame = cap.read()
         (eyeMetrics, inputFrame), frame = cornea.readEyes(frame)
-        inputFrames.append(cornea.preProcess(frame=inputFrame))
+        inputFrames.append(cornea.preProcessOnTheFly(frame))
         inputMetrics.append(eyeMetrics)
 
     inputMetrics = np.array(inputMetrics)

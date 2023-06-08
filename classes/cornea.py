@@ -73,7 +73,7 @@ class CorneaReader():
 
             return (eyesMetrics, frame), frame
         
-        return None, frame
+        return (None, None), frame
 
     def __visualize(self, frame: np.ndarray, meshPoints: np.ndarray, leftCenter: np.ndarray, rightCenter: np.ndarray) -> np.ndarray:
         """private method to visualize gathered eye data on the current frame"""
@@ -131,7 +131,13 @@ class CorneaReader():
         np.savez(f"data/{saveDir}/{i}", eyesMetrics=eyesMetrics, croppedFrame=croppedFrame, mousePos=mousePos)
 
     def preProcess(self, dataDir: str = None) -> None:
-        """static method to load the image and metrics data from a given directory"""
+        """PreProcessing function that would process the frame of each sample from all data saved in dataDir
+        
+        INPUT
+        ---------
+        dataDir: required, the directory containing the data for preprocessing
+
+        """
         if dataDir:
             filesPath = f"data/{dataDir}/"
             samplesFilesNames = os.listdir(filesPath)
@@ -160,6 +166,21 @@ class CorneaReader():
             return (eyesMetrics, frames, mousePos)
         else:
             return self.__paddingRestOfImage(frame)
+        
+    def preProcessOnTheFly(self, frame: np.ndarray) -> np.ndarray:
+        """PreProcessing function that would process the frame on the fly instead of reading files and saving to them
+        
+        INPUT
+        ---------
+        frame: required the frame to be processed
+
+        OUTPUT
+        ---------
+        frame: the frame after processing 
+        
+        """
+
+        return self.__paddingRestOfImage(frame)
 
     def __del__(self) -> None:
         """dunder delete method to clean up class after finishing"""
@@ -210,7 +231,7 @@ class CorneaReader():
                                 value=(0, 0, 0))
         return image
 
-    def __showFrameThenExit(self, frame: np.ndarray, sec: int) -> None:
+    def showFrameThenExit(self, frame: np.ndarray, sec: int) -> None:
         """A debugging method used to show a frame for a number of seconds and exit do not use unless debugging only"""
         cv2.imshow("frame", frame)
         cv2.waitKey(sec*1000)
