@@ -130,7 +130,7 @@ class CorneaReader():
         self.savedSampleCount = i
         np.savez(f"data/{saveDir}/{i}", eyesMetrics=eyesMetrics, croppedFrame=croppedFrame, mousePos=mousePos)
 
-    def preProcess(self, dataDir: str = None):
+    def preProcess(self, dataDir: str = None) -> None:
         """static method to load the image and metrics data from a given directory"""
         if dataDir:
             filesPath = f"data/{dataDir}/"
