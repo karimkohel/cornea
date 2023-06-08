@@ -4,7 +4,7 @@ import pyautogui
 import cv2
 from classes.cornea import CorneaReader
 
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 cornea = CorneaReader()
 model = tf.keras.models.load_model('models/convModelTest1.h5')
 
