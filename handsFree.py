@@ -7,7 +7,7 @@ import time
 
 cap = cv2.VideoCapture(0)
 cornea = CorneaReader()
-model = tf.keras.models.load_model('models/convModelTest1.h5')
+model = tf.keras.models.load_model('models/convModelTest3.h5')
 
 
 for i in range(50):

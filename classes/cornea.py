@@ -2,7 +2,7 @@ import cv2
 import mediapipe as mp
 import numpy as np
 import os, time
-import pyautogui
+# import pyautogui
 from numpy import savez_compressed
 
 
@@ -141,17 +141,6 @@ class CorneaReader():
         if dataDir:
             filesPath = f"data/{dataDir}/"
             samplesFilesNames = os.listdir(filesPath)
-
-            for i, file in enumerate(samplesFilesNames):
-                file = np.load(filesPath+file)
-                resizedFrame = self.__paddingRestOfImage(file['croppedFrame'])
-                np.savez(f"data/{dataDir}/{i}", eyesMetrics=file['eyesMetrics'], croppedFrame=resizedFrame, mousePos=file['mousePos'])
-
-        
-    def loadData(self, dataDir: str = None, frame: np.ndarray = None) -> np.ndarray:
-        if dataDir:
-            filesPath = f"data/{dataDir}/"
-            samplesFilesNames = os.listdir(filesPath)
             eyesMetrics = np.empty((len(samplesFilesNames), self.FACE_METRICS_LEN))
             frames = []
             mousePos = np.empty((len(samplesFilesNames), 2))
@@ -159,13 +148,18 @@ class CorneaReader():
             for i, file in enumerate(samplesFilesNames):
                 file = np.load(filesPath+file)
                 eyesMetrics[i] = file['eyesMetrics']
-                frames.append(file['croppedFrame'])                
+                resizedFrame = self.__paddingRestOfImage(file['croppedFrame'])
+                frames.append(resizedFrame)
                 mousePos[i] = file['mousePos']
             frames = np.array(frames)
+            np.savez(f"data/{dataDir}/allDataArray", eyesMetrics=eyesMetrics, croppedFrame=frames, mousePos=mousePos)
+
         
-            return (eyesMetrics, frames, mousePos)
-        else:
-            return self.__paddingRestOfImage(frame)
+    def loadData(self, dataDir: str) -> np.ndarray:
+        filesPath = f"data/{dataDir}/"
+        file = np.load(filesPath+'allDataArray.npz')
+        return (file["eyesMetrics"], file['croppedFrame'], file["mousePos"])
+
         
     def preProcessOnTheFly(self, frame: np.ndarray) -> np.ndarray:
         """PreProcessing function that would process the frame on the fly instead of reading files and saving to them
@@ -239,6 +233,36 @@ class CorneaReader():
         exit()
 
 
-    def saveMetaData(self):
-        with open(f"data/{self.saveDir}/sampleCount.txt", "w") as f:
-            f.write(str(self.savedSampleCount))
+
+
+    # def preProcess(self, dataDir: str = None) -> None:
+    #     """PreProcessing function that would process the frame of each sample from all data saved in dataDir
+        
+    #     INPUT
+    #     ---------
+    #     dataDir: required, the directory containing the data for preprocessing
+
+    #     """
+    #     if dataDir:
+    #         filesPath = f"data/{dataDir}/"
+    #         samplesFilesNames = os.listdir(filesPath)
+
+    #         samplesFilesNames = os.listdir(filesPath)
+    #         eyesMetrics = np.empty((len(samplesFilesNames), self.FACE_METRICS_LEN))
+    #         frames = []
+    #         mousePos = np.empty((len(samplesFilesNames), 2))
+
+    #         for i, file in enumerate(samplesFilesNames):
+    #             file = np.load(filesPath+file)
+    #             eyesMetrics[i] = file['eyesMetrics']
+    #             resizedFrame = self.__paddingRestOfImage(file['croppedFrame'])
+    #             frames.append(resizedFrame)
+    #             mousePos[i] = file['mousePos']
+    #         frames = np.array(frames)
+    #         np.savez(f"data/{dataDir}/allDataArray", eyesMetrics=eyesMetrics, croppedFrame=frames, mousePos=mousePos)
+
+        
+    # def loadData(self, dataDir: str) -> np.ndarray:
+    #     filesPath = f"data/{dataDir}/"
+    #     file = np.load(filesPath+file)
+    #     return (file["eyesMetrics"], file['croppedFrame'], file["mousePos"])

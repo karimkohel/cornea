@@ -3,4 +3,4 @@ from classes.cornea import CorneaReader
 
 cornea = CorneaReader()
 
-cornea.preProcess('kkTest')
+cornea.preProcess('datesetTest')

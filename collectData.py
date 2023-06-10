@@ -17,6 +17,8 @@ while True:
         key = cv2.waitKey(1)
         if key == ord('s'):
             break
+        elif key == ord('q'):
+            exit()
         cv2.imshow("Frame", frame)
 
 while True:
@@ -24,7 +26,7 @@ while True:
     ret, frame = cap.read()
 
     if ret:
-        _, croppedFrame = cornea.readEyes(frame, 'datesetTest')
+        _, croppedFrame = cornea.readEyes(frame, 'continuedDateTest')
 
         key = cv2.waitKey(3)
         if key == ord('q'):
