@@ -231,38 +231,3 @@ class CorneaReader():
         cv2.waitKey(sec*1000)
         cv2.destroyAllWindows()
         exit()
-
-
-
-
-    # def preProcess(self, dataDir: str = None) -> None:
-    #     """PreProcessing function that would process the frame of each sample from all data saved in dataDir
-        
-    #     INPUT
-    #     ---------
-    #     dataDir: required, the directory containing the data for preprocessing
-
-    #     """
-    #     if dataDir:
-    #         filesPath = f"data/{dataDir}/"
-    #         samplesFilesNames = os.listdir(filesPath)
-
-    #         samplesFilesNames = os.listdir(filesPath)
-    #         eyesMetrics = np.empty((len(samplesFilesNames), self.FACE_METRICS_LEN))
-    #         frames = []
-    #         mousePos = np.empty((len(samplesFilesNames), 2))
-
-    #         for i, file in enumerate(samplesFilesNames):
-    #             file = np.load(filesPath+file)
-    #             eyesMetrics[i] = file['eyesMetrics']
-    #             resizedFrame = self.__paddingRestOfImage(file['croppedFrame'])
-    #             frames.append(resizedFrame)
-    #             mousePos[i] = file['mousePos']
-    #         frames = np.array(frames)
-    #         np.savez(f"data/{dataDir}/allDataArray", eyesMetrics=eyesMetrics, croppedFrame=frames, mousePos=mousePos)
-
-        
-    # def loadData(self, dataDir: str) -> np.ndarray:
-    #     filesPath = f"data/{dataDir}/"
-    #     file = np.load(filesPath+file)
-    #     return (file["eyesMetrics"], file['croppedFrame'], file["mousePos"])
