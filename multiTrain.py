@@ -8,9 +8,12 @@ eyesMetrics, frames, y = cr.loadData('datesetTest')
 convInput = tf.keras.layers.Input(shape=(cr.TARGET_IMG_SIZE[0],cr.TARGET_IMG_SIZE[1], 1), name="frames")
 denseInput = tf.keras.layers.Input(shape=(cr.FACE_METRICS_LEN), name='eyesMetrics')
 
-x1 = tf.keras.layers.Conv2D(42, (3,3), activation='swish', input_shape=convInput.shape)(convInput)
+
+CNN_KERNEL_SIZE = (3, 7)
+
+x1 = tf.keras.layers.Conv2D(42, CNN_KERNEL_SIZE, activation='swish', input_shape=convInput.shape)(convInput)
 x1 = tf.keras.layers.MaxPool2D()(x1)
-x1 = tf.keras.layers.Conv2D(42, (3,3), activation='swish', input_shape=x1.shape)(x1)
+x1 = tf.keras.layers.Conv2D(42, CNN_KERNEL_SIZE, activation='swish', input_shape=x1.shape)(x1)
 x1 = tf.keras.layers.MaxPool2D()(x1)
 x1 = tf.keras.layers.Flatten()(x1)
 
@@ -30,7 +33,7 @@ model.compile(
 
 model.summary()
 tensorboard = tf.keras.callbacks.TensorBoard(
-    log_dir="modelLogs/epochs60batch32swishactivation",
+    log_dir="modelLogs/epochs60_batch32_swishactivation_3,7kernel",
     histogram_freq=1,
     update_freq='epoch',
     write_graph=True
@@ -48,4 +51,4 @@ model.fit(
     shuffle=True
 )
 
-model.save("models/convModelTest4.h5")
+model.save("models/convModelTest5.h5")
