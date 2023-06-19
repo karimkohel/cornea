@@ -3,7 +3,6 @@ import mediapipe as mp
 import numpy as np
 import os, time
 # import pyautogui
-from numpy import savez_compressed
 
 
 class CorneaReader():
