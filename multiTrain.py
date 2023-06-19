@@ -1,27 +1,27 @@
 import tensorflow as tf
 from classes.cornea import CorneaReader
+from sklearn import preprocessing
+import numpy as np
 
 cr = CorneaReader()
 eyesMetrics, frames, y = cr.loadData('datesetTest')
 
-
 convInput = tf.keras.layers.Input(shape=(cr.TARGET_IMG_SIZE[0],cr.TARGET_IMG_SIZE[1], 1), name="frames")
 denseInput = tf.keras.layers.Input(shape=(cr.FACE_METRICS_LEN), name='eyesMetrics')
 
+CNN_KERNEL_SIZE = (3, 5)
 
-CNN_KERNEL_SIZE = (3, 7)
-
-x1 = tf.keras.layers.Conv2D(42, CNN_KERNEL_SIZE, activation='swish', input_shape=convInput.shape)(convInput)
+x1 = tf.keras.layers.Conv2D(40, CNN_KERNEL_SIZE, activation='swish', input_shape=convInput.shape)(convInput)
 x1 = tf.keras.layers.MaxPool2D()(x1)
-x1 = tf.keras.layers.Conv2D(42, CNN_KERNEL_SIZE, activation='swish', input_shape=x1.shape)(x1)
+x1 = tf.keras.layers.Conv2D(30, CNN_KERNEL_SIZE, activation='swish', input_shape=x1.shape)(x1)
 x1 = tf.keras.layers.MaxPool2D()(x1)
 x1 = tf.keras.layers.Flatten()(x1)
 
-x2 = tf.keras.layers.Dense(80, activation='swish')(denseInput)
+x2 = tf.keras.layers.Dense(50, activation='swish')(denseInput)
 
 x = tf.keras.layers.concatenate([x1, x2])
-x = tf.keras.layers.Dense(120, activation='swish')(x)
 x = tf.keras.layers.Dense(80, activation='swish')(x)
+x = tf.keras.layers.Dense(50, activation='swish')(x)
 output = tf.keras.layers.Dense(2, activation='relu', name="mousePosition")(x)
 
 model = tf.keras.Model(inputs=[convInput, denseInput], outputs=output, name='multEye')
@@ -33,7 +33,7 @@ model.compile(
 
 model.summary()
 tensorboard = tf.keras.callbacks.TensorBoard(
-    log_dir="modelLogs/epochs60_batch32_swishactivation_3,7kernel",
+    log_dir="modelLogs/epochs60_batch32_swishactivation_3,5kernel_lessNodes",
     histogram_freq=1,
     update_freq='epoch',
     write_graph=True
@@ -51,4 +51,4 @@ model.fit(
     shuffle=True
 )
 
-model.save("models/convModelTest5.h5")
+model.save("models/convModelTest7.h5")
