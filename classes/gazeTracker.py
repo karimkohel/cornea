@@ -17,7 +17,7 @@ class GazeTracker():
         self.model = tf_load_model(modelDir)
 
 
-    def track_gaze(self, frames: list[np.ndarray]) -> Tuple[int, int]:
+    def track_gaze(self, frames: list[np.ndarray]) -> np.ndarray:
         """Main method for taking in a list of frames and then giving the output coordinates of user gaze on the screen.
             the method will loop over the given frames and predict gaze location for each one, then average out the predictions and return the result
 
@@ -39,4 +39,4 @@ class GazeTracker():
         predictions = self.model.predict([inputFrames, inputMetrics])
         coordinates = np.average(predictions, axis=0)
 
-        return int(coordinates)
+        return coordinates
