@@ -30,7 +30,11 @@ class GazeTracker():
         inputMetrics = []
 
         for frame in frames:
-            (eyeMetrics, inputFrame), frame = self.corneaReader.readEyes(frame)
+            try:
+                (eyeMetrics, inputFrame), frame = self.corneaReader.readEyes(frame)
+            except TypeError as e:
+                print(e)
+                return None
             inputFrames.append(self.corneaReader.preProcessOnTheFly(frame))
             inputMetrics.append(eyeMetrics)
 
