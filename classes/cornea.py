@@ -2,7 +2,6 @@ import cv2
 import mediapipe as mp
 import numpy as np
 import os, time
-# import pyautogui
 
 
 class CorneaReader():
@@ -28,6 +27,7 @@ class CorneaReader():
         self.data = None
 
     def readEyes(self, frame: np.ndarray, saveDir: str = None) -> np.ndarray:
+        import pyautogui
         """Method to derive all eye points needed from a frame
 
         the method saves the eye distances as the first 33 elements of the data array, the xy labels for mouse as the 34th and 35th elements, while the rest is the image data
