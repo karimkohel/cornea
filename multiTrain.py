@@ -17,7 +17,7 @@ x1 = tf.keras.layers.Conv2D(30, CNN_KERNEL_SIZE, activation='swish', input_shape
 x1 = tf.keras.layers.MaxPool2D()(x1)
 x1 = tf.keras.layers.Flatten()(x1)
 
-x2 = tf.keras.layers.Dense(50, activation='swish')(denseInput)
+x2 = tf.keras.layers.Dense(50, activation='tanh')(denseInput)
 
 x = tf.keras.layers.concatenate([x1, x2])
 x = tf.keras.layers.Dense(80, activation='swish')(x)
@@ -33,7 +33,7 @@ model.compile(
 
 model.summary()
 tensorboard = tf.keras.callbacks.TensorBoard(
-    log_dir="modelLogs/epochs60_batch32_swishactivation_3,5kernel_lessNodes",
+    log_dir="modelLogs/epochs60_batch32_swishConv_3,5kernel_lessNodes_tanhMetrics_40,30ConvNodes",
     histogram_freq=1,
     update_freq='epoch',
     write_graph=True
@@ -51,4 +51,4 @@ model.fit(
     shuffle=True
 )
 
-model.save("models/convModelTest7.h5")
+model.save("models/convModelTest8.h5")

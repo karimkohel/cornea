@@ -3,7 +3,7 @@ import pyautogui
 from classes.gazeTracker import GazeTracker
 
 cap = cv2.VideoCapture(0)
-gazeTracker = GazeTracker('models/convModelTest3.h5')
+gazeTracker = GazeTracker('models/convModelTest6.h5')
 
 for i in range(30):
     _, frame = cap.read()

@@ -3,10 +3,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pyautogui
 from classes.gazeTracker import GazeTracker
-import pandas as pd
+import statistics
 
 cap = cv2.VideoCapture(0)
-gazeTracker = GazeTracker('models/convModelTest3.h5')
+gazeTracker = GazeTracker('models/convModelTest8.h5')
 
 for i in range(30):
     _, frame = cap.read()
@@ -14,10 +14,10 @@ for i in range(30):
 distances = []
 
 
-while True:
+for i in range(1500):
 
     frames = []
-    for _ in range(3):
+    for _ in range(1):
         ret, frame = cap.read()
         frames.append(frame)
 
@@ -44,3 +44,9 @@ plt.xlabel('Value')
 plt.ylabel('Frequency')
 plt.title('Histogram')
 plt.show()
+
+distancesNpArray = np.array(distances)
+stdDeviation = np.std(distancesNpArray, ddof=1)
+
+print("Mean: ", statistics.mean(distances))
+print("Standard Deviation: ", stdDeviation)
